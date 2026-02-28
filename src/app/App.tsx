@@ -16,7 +16,7 @@ import { PassphraseScreen } from '@/components/ui/PassphraseScreen';
 import { ShareModal } from '@/components/ui/ShareModal';
 import { RadialTree } from '@/components/tree/RadialTree';
 import { EditPanel } from '@/components/editor/EditPanel';
-import { AddPanel } from '@/components/editor/AddPanel';
+import { AddModal } from '@/components/editor/AddModal';
 import { Legend } from '@/components/ui/Legend';
 import { ExportImportBar } from '@/components/ui/ExportImportBar';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -102,7 +102,7 @@ export default function App() {
   return (
     <div className="noise-bg h-dvh flex flex-col relative">
       {/* Header */}
-      <header className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-charcoal-lighter/50 bg-charcoal/80 backdrop-blur-sm z-10 relative">
+      <header className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-charcoal-lighter/50 bg-charcoal/80 backdrop-blur-sm z-40 relative">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <TreePine size={18} className="text-amber" />
@@ -199,7 +199,7 @@ export default function App() {
         <EditPanel />
 
         {/* Add Relative Panel */}
-        <AddPanel />
+        <AddModal />
 
         {/* Legend */}
         {tree && <Legend />}

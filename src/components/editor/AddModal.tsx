@@ -1,9 +1,9 @@
-import { Panel } from '@/components/ui/Panel';
+import { Modal } from '@/components/ui/Modal';
 import { AddRelativeForm } from './AddRelativeForm';
 import { useTreeStore } from '@/hooks/useTree';
 import { useI18n } from '@/lib/i18n';
 
-export function AddPanel() {
+export function AddModal() {
   const tree = useTreeStore((s) => s.tree);
   const addingForMemberId = useTreeStore((s) => s.addingForMemberId);
   const setAddingFor = useTreeStore((s) => s.setAddingFor);
@@ -12,7 +12,7 @@ export function AddPanel() {
   const member = tree?.members.find((m) => m.id === addingForMemberId);
 
   return (
-    <Panel
+    <Modal
       isOpen={!!member}
       onClose={() => setAddingFor(null)}
       title={
@@ -22,10 +22,8 @@ export function AddPanel() {
       }
     >
       {member && (
-        <div className="p-5 space-y-4 overflow-y-auto flex-1">
-          <AddRelativeForm memberId={member.id} memberName={member.name} />
-        </div>
+        <AddRelativeForm memberId={member.id} memberName={member.name} />
       )}
-    </Panel>
+    </Modal>
   );
 }
