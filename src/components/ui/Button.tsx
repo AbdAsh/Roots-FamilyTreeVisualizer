@@ -1,3 +1,14 @@
+/**
+ * Configurable button component with variant and size presets.
+ *
+ * Variants: `primary` (amber CTA), `secondary` (outlined), `ghost` (transparent), `danger` (red).
+ * Sizes: `sm`, `md`, `lg`.
+ *
+ * @example
+ * ```tsx
+ * <Button variant="primary" size="lg" onClick={handleSave}>Save</Button>
+ * ```
+ */
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';

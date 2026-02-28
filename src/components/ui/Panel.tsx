@@ -1,3 +1,10 @@
+/**
+ * Slide-in side panel component.
+ *
+ * Slides in from the right edge of the screen using Framer Motion.
+ * Used for the edit panel and other side-docked UI.
+ * Z-index layering: backdrop = z-30, panel = z-20.
+ */
 import { type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';

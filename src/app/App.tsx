@@ -11,10 +11,12 @@ import {
   Loader2,
   AlertCircle,
   X,
+  Info,
 } from 'lucide-react';
 import { PassphraseScreen } from '@/components/ui/PassphraseScreen';
 import { ShareModal } from '@/components/ui/ShareModal';
-import { RadialTree } from '@/components/tree/RadialTree';
+import { AboutModal } from '@/components/ui/AboutModal';
+import { FamilyTreeView } from '@/components/tree/FamilyTreeView';
 import { EditPanel } from '@/components/editor/EditPanel';
 import { AddModal } from '@/components/editor/AddModal';
 import { Legend } from '@/components/ui/Legend';
@@ -42,6 +44,7 @@ export default function App() {
 
   const { strings } = useI18n();
   const [shareOpen, setShareOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
@@ -181,6 +184,9 @@ export default function App() {
           {/* Language selector */}
           <LanguageSwitcher />
 
+          <Button variant="ghost" size="sm" onClick={() => setAboutOpen(true)}>
+            <Info size={14} />
+          </Button>
           <Button variant="ghost" size="sm" onClick={() => setShareOpen(true)}>
             <Share2 size={14} /> {strings.app.share}
           </Button>
@@ -192,8 +198,8 @@ export default function App() {
 
       {/* Main content */}
       <main className="flex-1 flex relative overflow-hidden">
-        {/* Radial Tree */}
-        <RadialTree searchQuery={searchQuery} />
+        {/* Family Tree View */}
+        <FamilyTreeView searchQuery={searchQuery} />
 
         {/* Edit Panel (slides in from right) */}
         <EditPanel />
@@ -216,6 +222,9 @@ export default function App() {
 
       {/* Share Modal */}
       <ShareModal isOpen={shareOpen} onClose={() => setShareOpen(false)} />
+
+      {/* About Modal */}
+      <AboutModal isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
 
       {/* Keyboard delete confirm */}
       <ConfirmModal

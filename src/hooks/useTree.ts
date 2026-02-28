@@ -1,3 +1,16 @@
+/**
+ * Central state store for the family tree.
+ *
+ * Uses Zustand to manage:
+ * - The `FamilyTree` object (members, relationships, metadata)
+ * - Selection and editing UI state
+ * - An undo/redo history stack (serialised JSON snapshots, max 50)
+ *
+ * **Mutation protocol:** All actions that modify the tree call `pushSnapshot()`
+ * before applying changes, so `undo()` / `redo()` always work correctly.
+ *
+ * @module useTree
+ */
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import type {
@@ -10,40 +23,60 @@ import type {
 /* ── Undo / Redo history ── */
 const MAX_HISTORY = 50;
 
+/** Shape of the Zustand tree store. */
 interface TreeState {
+  /** The current family tree, or `null` if no tree is loaded. */
   tree: FamilyTree | null;
+  /** ID of the currently selected member in the tree view. */
   selectedMemberId: string | null;
+  /** Whether the edit panel is open. */
   isEditing: boolean;
+  /** Member ID for which the "add relative" modal is open, or `null`. */
   addingForMemberId: string | null;
 
-  /* history stacks (serialised tree snapshots) */
+  /** @internal Undo stack — serialised JSON snapshots of past tree states. */
   _past: string[];
+  /** @internal Redo stack — serialised JSON snapshots of undone tree states. */
   _future: string[];
 
   // Tree lifecycle
+  /** Initialise a brand new tree with a single root member. */
   initTree: (name: string) => FamilyTree;
+  /** Replace the entire tree (used on load / import). Resets history. */
   setTree: (tree: FamilyTree) => void;
+  /** Clear the tree from memory (used on lock). */
   clearTree: () => void;
 
   // Member operations
+  /** Add a new member to the tree. Returns the created member with a generated ID. */
   addMember: (member: Omit<FamilyMember, 'id'>) => FamilyMember;
+  /** Update fields on an existing member. */
   updateMember: (id: string, updates: Partial<FamilyMember>) => void;
+  /** Remove a member and all their relationships. */
   removeMember: (id: string) => void;
 
   // Relationship operations
+  /** Add a relationship edge. Returns the created relationship with a generated ID. */
   addRelationship: (
     type: RelationshipType,
     from: string,
     to: string,
   ) => Relationship;
+  /** Remove a relationship by ID. */
   removeRelationship: (id: string) => void;
 
   // Selection
+  /** Select a member (or deselect by passing `null`). Opens edit panel. */
   selectMember: (id: string | null) => void;
+  /** Toggle the edit panel open/closed. */
   setEditing: (editing: boolean) => void;
+  /** Open/close the "add relative" modal for a given member. */
   setAddingFor: (memberId: string | null) => void;
 
-  // Convenience: add relative (creates member + relationship in one step)
+  /**
+   * Convenience: add a relative (creates member + relationship in one step).
+   * Also auto-infers additional relationships (e.g. sibling links to existing children).
+   */
   addRelative: (
     relativeTo: string,
     relType: 'parent' | 'child' | 'spouse' | 'sibling',
@@ -51,15 +84,23 @@ interface TreeState {
   ) => FamilyMember;
 
   // Undo / Redo
+  /** Undo the last tree mutation by restoring the previous snapshot. */
   undo: () => void;
+  /** Redo a previously undone mutation. */
   redo: () => void;
+  /** Returns `true` if there are past snapshots to undo. */
   canUndo: () => boolean;
+  /** Returns `true` if there are future snapshots to redo. */
   canRedo: () => boolean;
 }
 
 /* ── Helpers ── */
 
-/** Push the current tree onto the _past stack (call BEFORE mutating). */
+/**
+ * Push the current tree onto the `_past` stack.
+ * **Must be called BEFORE mutating the tree** so undo always has the correct pre-mutation state.
+ * Clears the `_future` stack (new mutation branches discard redo history).
+ */
 function pushSnapshot(state: TreeState): Partial<TreeState> {
   if (!state.tree) return {};
   const snap = JSON.stringify(state.tree);
@@ -68,7 +109,10 @@ function pushSnapshot(state: TreeState): Partial<TreeState> {
   return { _past: past, _future: [] };
 }
 
-/** Check if a relationship already exists (duplicate guard). */
+/**
+ * Check if a relationship already exists between two members.
+ * Symmetric relationship types (`spouse`, `sibling`) are checked in both directions.
+ */
 function hasDuplicate(
   rels: Relationship[],
   type: RelationshipType,

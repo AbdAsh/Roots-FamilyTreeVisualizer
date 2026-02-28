@@ -1,3 +1,19 @@
+/**
+ * Internationalisation (i18n) system for Roots.
+ *
+ * Supports three locales: English (`en`), Arabic (`ar`, RTL), and Turkish (`tr`).
+ * All UI strings are strongly typed via the {@link Translations} interface —
+ * TypeScript enforces that every locale provides every key at compile time.
+ *
+ * **Usage:**
+ * - Wrap the app in `<I18nProvider>` (done in `main.tsx`)
+ * - Access strings via `useI18n()` → `strings.section.key`
+ * - Interpolation: `t(strings.auth.throttled, { seconds: '5' })` for `"{seconds}"` placeholders
+ * - Plurals: `tPlural(strings.app.memberCount, count)` — templates use `||` separator:
+ *   `"{count} member||{count} members"` (singular before `||`, plural after)
+ *
+ * @module i18n
+ */
 import {
   createContext,
   useContext,
@@ -22,6 +38,17 @@ export const LOCALE_META: Record<
 /* ─── Translation keys ─── */
 // All leaf-string keys used across the app.
 // Nested structure: section -> key -> string
+/**
+ * All leaf-string keys used across the app.
+ * Nested structure: `section.key` → translated string.
+ *
+ * **Adding new strings:** Add the key to this interface first, then add
+ * the translation to all three locale objects (`en`, `ar`, `tr`).
+ * TypeScript strict mode will error on any missing keys.
+ *
+ * **Placeholders:** Use `{key}` syntax, e.g. `"Hello {name}"`. Interpolated at runtime by {@link t}.
+ * **Plurals:** Use `||` separator, e.g. `"{count} member||{count} members"`. Handled by {@link tPlural}.
+ */
 export interface Translations {
   // App chrome
   app: {
@@ -126,6 +153,31 @@ export interface Translations {
     capacityWarning: string;
     shareInstructions: string;
     shareInstructionsDetail: string;
+  };
+  // About modal
+  about: {
+    title: string;
+    whatIsRoots: string;
+    whatIsRootsDesc: string;
+    howItWorks: string;
+    howItWorksDesc: string;
+    pipeline: string;
+    layoutAlgorithm: string;
+    layoutAlgorithmDesc: string;
+    encryption: string;
+    encryptionDesc: string;
+    compression: string;
+    compressionDesc: string;
+    privacy: string;
+    privacyDesc: string;
+    techStack: string;
+    openSource: string;
+    openSourceDesc: string;
+    developer: string;
+    developerRole: string;
+    viewWebsite: string;
+    viewGithub: string;
+    viewLinkedin: string;
   };
   // Legend
   legend: {
@@ -276,6 +328,37 @@ const en: Translations = {
     shareInstructionsDetail:
       'The data is encrypted — no one can view it without the passphrase, not even us. There are no accounts or servers involved.',
   },
+  about: {
+    title: 'About Roots',
+    whatIsRoots: 'What is Roots?',
+    whatIsRootsDesc:
+      'Roots is a zero-backend family tree visualizer. Your entire family tree is encrypted and stored in the URL — no servers, no databases, no accounts. Share a link and a passphrase, and your family can view and edit the tree.',
+    howItWorks: 'How It Works',
+    howItWorksDesc:
+      'The family tree data flows through a pipeline entirely in your browser:',
+    pipeline: 'JSON → Brotli Compress → AES-256-GCM Encrypt → Base64url → URL Hash',
+    layoutAlgorithm: 'Layout Algorithm',
+    layoutAlgorithmDesc:
+      'The tree visualization uses the Buchheim-Reingold-Tilford algorithm — an O(n) layout that guarantees parents are centred over their children, subtrees never overlap, and identical subtrees are drawn identically. Spouse pairs are merged into couple containers.',
+    encryption: 'Encryption',
+    encryptionDesc:
+      'AES-256-GCM via the Web Crypto API. Keys are derived with PBKDF2 (600,000 iterations). Each save generates a fresh random salt (16 bytes) and IV (12 bytes). The passphrase never leaves memory.',
+    compression: 'Compression',
+    compressionDesc:
+      'Brotli compression (quality 11) via WebAssembly — runs before encryption because encrypted bytes have maximum entropy and don\'t compress. This maximises space savings within the ~8 KB URL limit.',
+    privacy: 'Privacy',
+    privacyDesc:
+      'No server. No cookies. No tracking. No analytics. Your data never leaves the browser. The passphrase is held in memory only and cleared when you lock the tree.',
+    techStack: 'Tech Stack',
+    openSource: 'Open Source',
+    openSourceDesc:
+      'Roots is open source under the Apache 2.0 license. Contributions are welcome!',
+    developer: 'Abdulrahman Mahmutoglu',
+    developerRole: 'Senior Frontend Engineer',
+    viewWebsite: 'Website',
+    viewGithub: 'GitHub',
+    viewLinkedin: 'LinkedIn',
+  },
   legend: {
     title: 'Legend',
     parentChild: 'Parent → Child',
@@ -416,6 +499,37 @@ const ar: Translations = {
     shareInstructions: 'شارك هذا الرابط مع كلمة المرور لمنح عائلتك حق الوصول.',
     shareInstructionsDetail:
       'البيانات مُشفّرة — لا يمكن لأحد عرضها بدون كلمة المرور، ولا حتى نحن. لا توجد حسابات أو خوادم.',
+  },
+  about: {
+    title: 'حول جذور',
+    whatIsRoots: 'ما هو جذور؟',
+    whatIsRootsDesc:
+      'جذور هو تطبيق لعرض شجرة العائلة بدون خوادم. يتم تشفير شجرة عائلتك بالكامل وتخزينها في الرابط — بدون خوادم، بدون قواعد بيانات، بدون حسابات. شارك الرابط وكلمة المرور، وسيتمكن أفراد عائلتك من عرض الشجرة وتعديلها.',
+    howItWorks: 'كيف يعمل',
+    howItWorksDesc:
+      'تمر بيانات شجرة العائلة عبر خط أنابيب بالكامل في متصفحك:',
+    pipeline: 'JSON → ضغط Brotli → تشفير AES-256-GCM → Base64url → رابط URL',
+    layoutAlgorithm: 'خوارزمية التخطيط',
+    layoutAlgorithmDesc:
+      'يستخدم عرض الشجرة خوارزمية Buchheim-Reingold-Tilford — تخطيط بتعقيد O(n) يضمن أن الآباء في المنتصف فوق أبنائهم، والأشجار الفرعية لا تتداخل أبداً، والأشجار الفرعية المتماثلة تُرسم بشكل متماثل.',
+    encryption: 'التشفير',
+    encryptionDesc:
+      'AES-256-GCM عبر Web Crypto API. يتم اشتقاق المفاتيح باستخدام PBKDF2 (٦٠٠,٠٠٠ تكرار). كل حفظ يولّد ملح عشوائي جديد (١٦ بايت) و IV (١٢ بايت). كلمة المرور لا تغادر الذاكرة أبداً.',
+    compression: 'الضغط',
+    compressionDesc:
+      'ضغط Brotli (جودة ١١) عبر WebAssembly — يتم قبل التشفير لأن البايتات المشفرة لا تنضغط. هذا يزيد توفير المساحة ضمن حد الرابط ~٨ كيلوبايت.',
+    privacy: 'الخصوصية',
+    privacyDesc:
+      'لا خوادم. لا ملفات تعريف ارتباط. لا تتبع. لا تحليلات. بياناتك لا تغادر المتصفح أبداً. كلمة المرور محفوظة في الذاكرة فقط وتُمسح عند قفل الشجرة.',
+    techStack: 'التقنيات المستخدمة',
+    openSource: 'مفتوح المصدر',
+    openSourceDesc:
+      'جذور مفتوح المصدر بموجب رخصة Apache 2.0. المساهمات مرحب بها!',
+    developer: 'عبدالرحمن محمد أوغلو',
+    developerRole: 'مهندس واجهات أمامية أول',
+    viewWebsite: 'الموقع',
+    viewGithub: 'GitHub',
+    viewLinkedin: 'LinkedIn',
   },
   legend: {
     title: 'دليل الرموز',
@@ -560,6 +674,37 @@ const tr: Translations = {
       'Bu bağlantıyı parolayla birlikte paylaşarak ailenize erişim verin.',
     shareInstructionsDetail:
       'Veriler şifrelenir — parola olmadan kimse göremez, biz bile. Hesap veya sunucu yoktur.',
+  },
+  about: {
+    title: 'Kökler Hakkında',
+    whatIsRoots: 'Kökler Nedir?',
+    whatIsRootsDesc:
+      'Kökler, sunucusuz bir aile ağacı görselleştiricisidir. Aile ağacınızın tamamı şifrelenerek URL\'de saklanır — sunucu yok, veritabanı yok, hesap yok. Bir bağlantı ve parola paylaşın, aileniz ağacı görüntüleyip düzenleyebilsin.',
+    howItWorks: 'Nasıl Çalışır',
+    howItWorksDesc:
+      'Aile ağacı verileri tamamen tarayıcınızda bir işlem hattından geçer:',
+    pipeline: 'JSON → Brotli Sıkıştırma → AES-256-GCM Şifreleme → Base64url → URL Hash',
+    layoutAlgorithm: 'Yerleşim Algoritması',
+    layoutAlgorithmDesc:
+      'Ağaç görselleştirmesi Buchheim-Reingold-Tilford algoritmasını kullanır — ebeveynlerin çocuklarının üzerinde ortalandığını, alt ağaçların hiç çakışmadığını ve özdeş alt ağaçların aynı şekilde çizildiğini garanti eden O(n) bir yerleşim.',
+    encryption: 'Şifreleme',
+    encryptionDesc:
+      'Web Crypto API ile AES-256-GCM. Anahtarlar PBKDF2 (600.000 iterasyon) ile türetilir. Her kayıtta yeni rastgele tuz (16 bayt) ve IV (12 bayt) üretilir. Parola asla bellekten çıkmaz.',
+    compression: 'Sıkıştırma',
+    compressionDesc:
+      'WebAssembly ile Brotli sıkıştırma (kalite 11) — şifreleme öncesi uygulanır çünkü şifreli baytlar sıkıştırılamaz. Bu, ~8 KB URL sınırı içinde maksimum alan tasarrufu sağlar.',
+    privacy: 'Gizlilik',
+    privacyDesc:
+      'Sunucu yok. Çerez yok. Takip yok. Analitik yok. Verileriniz tarayıcıdan asla çıkmaz. Parola yalnızca bellekte tutulur ve ağaç kilitlendiğinde silinir.',
+    techStack: 'Teknoloji Yığını',
+    openSource: 'Açık Kaynak',
+    openSourceDesc:
+      'Kökler, Apache 2.0 lisansı altında açık kaynaklıdır. Katkılar memnuniyetle karşılanır!',
+    developer: 'Abdulrahman Mahmutoğlu',
+    developerRole: 'Kıdemli Frontend Mühendisi',
+    viewWebsite: 'Web Sitesi',
+    viewGithub: 'GitHub',
+    viewLinkedin: 'LinkedIn',
   },
   legend: {
     title: 'Açıklama',

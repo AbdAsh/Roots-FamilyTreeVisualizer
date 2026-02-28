@@ -1,3 +1,16 @@
+/**
+ * SVG-based family tree renderer.
+ *
+ * Renders the computed Buchheim-Reingold-Tilford layout as an interactive SVG.
+ * Handles:
+ * - **Pan & zoom** — via manual transform refs (not D3-zoom)
+ * - **Node interactions** — click to select/edit, “+” button to add relatives, “×” button to delete
+ * - **Link paths** — cubic beziers for parent-child, quadratic arcs for siblings, straight lines for spouses
+ * - **Search highlighting** — dims non-matching nodes when a search query is active
+ * - **Animated transitions** — smooth zoom-to-fit on first render and member additions
+ *
+ * @module FamilyTreeView
+ */
 import { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 
 import { useTreeStore } from '@/hooks/useTree';
@@ -126,7 +139,7 @@ function linkCls(type: PositionedLink['type']): string {
 }
 
 /* ═══ Component ═══ */
-export function RadialTree({ searchQuery = '' }: { searchQuery?: string }) {
+export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
   const tree = useTreeStore((s) => s.tree);
   const selectedMemberId = useTreeStore((s) => s.selectedMemberId);
   const selectMember = useTreeStore((s) => s.selectMember);

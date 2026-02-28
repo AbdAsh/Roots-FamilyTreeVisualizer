@@ -1,3 +1,9 @@
+/**
+ * Styled select dropdown with optional label and error message.
+ *
+ * Wraps a native `<select>` element. Options are provided as an array of
+ * `{ value, label }` objects.
+ */
 import { type SelectHTMLAttributes, forwardRef } from 'react';
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {

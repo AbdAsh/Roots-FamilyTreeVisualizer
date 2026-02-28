@@ -1,0 +1,21 @@
+{
+  "name": "Roots — Family Tree Visualizer",
+  "short_name": "Roots",
+  "description": "Zero-backend, encrypted family tree visualizer stored entirely in the URL",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

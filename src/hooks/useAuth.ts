@@ -1,3 +1,14 @@
+/**
+ * Authentication store for the passphrase-based unlock flow.
+ *
+ * Roots has no accounts or server auth. Security is handled entirely client-side:
+ * - The user provides a passphrase that derives an AES-256-GCM key (PBKDF2, 600k iterations)
+ * - The passphrase is **kept in memory only** — never persisted to localStorage/cookies
+ * - Failed unlock attempts trigger exponential backoff (managed by `passphrase.ts`)
+ * - Locking clears the passphrase from memory immediately
+ *
+ * @module useAuth
+ */
 import { create } from 'zustand';
 import { loadFromHash, hasHashData } from '@/lib/url';
 import {

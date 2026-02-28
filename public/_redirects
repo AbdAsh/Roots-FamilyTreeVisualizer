@@ -1,2 +1,2 @@
-/*  Cloudflare Pages SPA redirect — send all paths to index.html */
-/*  /index.html   200 */
+# Netlify / Cloudflare Pages SPA redirect — send all paths to index.html
+/*  /index.html   200

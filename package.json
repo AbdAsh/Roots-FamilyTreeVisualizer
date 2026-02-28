@@ -2,11 +2,30 @@
   "name": "familytreevisualizer",
   "version": "0.1.0",
   "private": true,
+  "description": "Zero-backend, encrypted family tree visualizer stored entirely in the URL",
+  "keywords": [
+    "family-tree",
+    "genealogy",
+    "encryption",
+    "zero-backend",
+    "react",
+    "visualization",
+    "aes-gcm",
+    "brotli"
+  ],
+  "homepage": "https://roots.abdash.net",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AbdAsh/FamilyTreeVisualizer"
+  },
+  "license": "Apache-2.0",
+  "author": "Abdulrahman Mahmutoglu <abdulrahmanmahmutoglu@gmail.com> (https://abdash.net)",
   "type": "module",
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "brotli-wasm": "^3.0.1",

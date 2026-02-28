@@ -263,6 +263,18 @@ export function PassphraseScreen() {
         </p>
       </motion.div>
 
+      {/* Developer credit */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
+        <a
+          href="https://abdash.net"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] text-cream/15 hover:text-cream/30 transition-colors"
+        >
+          Built by Abdulrahman Mahmutoglu
+        </a>
+      </div>
+
       {/* Reset confirmation modal */}
       <ConfirmModal
         isOpen={showResetConfirm}

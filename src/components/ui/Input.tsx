@@ -1,3 +1,9 @@
+/**
+ * Styled text input with optional label and error message.
+ *
+ * Wraps a native `<input>` element with the project's charcoal/cream theme.
+ * Supports all standard HTML input attributes via spread props.
+ */
 import { type InputHTMLAttributes, forwardRef } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {

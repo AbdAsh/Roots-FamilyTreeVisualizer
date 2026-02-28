@@ -1,3 +1,16 @@
+/**
+ * Animated overlay modal component.
+ *
+ * Uses Framer Motion for enter/exit animations. Closes on Escape key or backdrop click.
+ * Content is rendered inside a charcoal card with optional title header.
+ *
+ * @example
+ * ```tsx
+ * <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Settings">
+ *   <p>Modal content here</p>
+ * </Modal>
+ * ```
+ */
 import { type ReactNode, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';

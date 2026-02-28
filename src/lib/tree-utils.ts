@@ -1,3 +1,30 @@
+/**
+ * Tree layout engine and graph query helpers.
+ *
+ * This module contains:
+ * - **`computeTieredLayout()`** — the core layout algorithm (Buchheim-Reingold-Tilford
+ *   with couple containers). Produces pixel coordinates for rendering.
+ * - **`toD3Hierarchy()`** — converts a flat `FamilyTree` to a D3-compatible hierarchy
+ *   (used for legacy compatibility; the tiered layout is the primary renderer).
+ * - **Graph query helpers** — `getParents()`, `getChildren()`, `getSpouse()`, `getSiblings()`,
+ *   `getRelationshipsForMember()`.
+ * - **`getInferredRelationships()`** — auto-suggests additional relationships when adding
+ *   a new relative (e.g. sibling links to existing children).
+ *
+ * ### Layout Algorithm Overview
+ *
+ * `computeTieredLayout()` implements Buchheim-Reingold-Tilford (O(n)):
+ * 1. BFS from `rootMemberId` assigns generation tiers (0 = root, negative = ancestors, positive = descendants)
+ * 2. Spouse pairs are merged into single "couple container" units
+ * 3. `firstWalk` (post-order) assigns preliminary x via contour comparison (`apportion`)
+ * 4. `secondWalk` (pre-order) accumulates `mod` for final x
+ * 5. `thirdWalk` shifts for non-negative x; positions scaled to pixels
+ *
+ * **Guarantees:** parents centred over children, subtrees never overlap,
+ * identical subtrees drawn identically, middle siblings evenly spaced.
+ *
+ * @module tree-utils
+ */
 import * as d3 from 'd3';
 import type {
   FamilyTree,
@@ -544,6 +571,15 @@ function thirdWalk(v: BNode, n: number) {
 
 /* ═══════ Main layout function ═══════ */
 
+/**
+ * Compute pixel positions for every member in the family tree using the
+ * Buchheim-Reingold-Tilford algorithm with couple-container extensions.
+ *
+ * @param tree - The family tree to lay out.
+ * @returns A {@link TieredLayout} with `positions` (Map of member ID → `{x, y, tier}`),
+ *   `tierMap` (Map of member ID → tier number), and `spouseMap` (Map of member ID → spouse ID).
+ *   Returns `null` if the tree is empty.
+ */
 export function computeTieredLayout(tree: FamilyTree): TieredLayout | null {
   if (!tree || tree.members.length === 0) return null;
 
