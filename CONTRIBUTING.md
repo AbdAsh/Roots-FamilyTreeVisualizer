@@ -22,12 +22,12 @@ The dev server starts at `http://localhost:5173`.
 
 ### Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start the development server |
-| `npm run build` | Type-check and build for production |
-| `npm run preview` | Preview the production build |
-| `npm run typecheck` | Run TypeScript compiler (no emit) |
+| Command             | Description                         |
+| ------------------- | ----------------------------------- |
+| `npm run dev`       | Start the development server        |
+| `npm run build`     | Type-check and build for production |
+| `npm run preview`   | Preview the production build        |
+| `npm run typecheck` | Run TypeScript compiler (no emit)   |
 
 ## Project Architecture
 

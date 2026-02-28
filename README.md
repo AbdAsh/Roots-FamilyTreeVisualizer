@@ -53,19 +53,19 @@ Roots stores the entire family tree in the URL fragment (hash). The data pipelin
 
 **Loading reverses the pipeline:** `URL hash → base64url decode → AES-GCM decrypt → Brotli decompress → JSON`
 
-### Why compress *before* encrypting?
+### Why compress _before_ encrypting?
 
 Encrypted bytes have maximum entropy and don't compress well. By compressing the raw JSON first (which is highly compressible), we get the best size reduction before encryption makes the data incompressible.
 
 ### Encryption Details
 
-| Parameter | Value |
-|-----------|-------|
-| Algorithm | AES-256-GCM |
-| Key derivation | PBKDF2 with 600,000 iterations |
-| Salt | 16 bytes (random, prepended to ciphertext) |
-| IV | 12 bytes (random, prepended after salt) |
-| Wire format | `[16B salt][12B IV][ciphertext]` |
+| Parameter      | Value                                      |
+| -------------- | ------------------------------------------ |
+| Algorithm      | AES-256-GCM                                |
+| Key derivation | PBKDF2 with 600,000 iterations             |
+| Salt           | 16 bytes (random, prepended to ciphertext) |
+| IV             | 12 bytes (random, prepended after salt)    |
+| Wire format    | `[16B salt][12B IV][ciphertext]`           |
 
 ### Layout Algorithm
 
@@ -81,18 +81,18 @@ The tree visualization uses the **Buchheim-Reingold-Tilford** algorithm — an O
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | React 19 |
-| Language | TypeScript (strict) |
-| State | Zustand |
+| Layer       | Technology                                 |
+| ----------- | ------------------------------------------ |
+| Framework   | React 19                                   |
+| Language    | TypeScript (strict)                        |
+| State       | Zustand                                    |
 | Layout math | D3 (hierarchy only — no D3 selections/DOM) |
-| Animation | Framer Motion |
-| Styling | Tailwind CSS v4 |
-| Build | Vite 7 |
-| Validation | Zod |
-| Compression | Brotli (WASM) |
-| Encryption | Web Crypto API |
+| Animation   | Framer Motion                              |
+| Styling     | Tailwind CSS v4                            |
+| Build       | Vite 7                                     |
+| Validation  | Zod                                        |
+| Compression | Brotli (WASM)                              |
+| Encryption  | Web Crypto API                             |
 
 ## Getting Started
 
@@ -157,7 +157,14 @@ src/
 
 ## Deployment
 
-Roots is deployed on [Netlify](https://www.netlify.com/). The `public/_redirects` file handles SPA routing. Any static hosting service works — just ensure all paths resolve to `index.html`.
+Roots is deployed on [Cloudflare Pages](https://pages.cloudflare.com/). The `wrangler.jsonc` config points to the `dist/` build output. To deploy:
+
+```bash
+npm run build
+npx wrangler pages deploy
+```
+
+The `public/_redirects` file handles SPA routing for Cloudflare Pages (and Netlify). Any static hosting service works — just ensure all paths resolve to `index.html`.
 
 ## Contributing
 

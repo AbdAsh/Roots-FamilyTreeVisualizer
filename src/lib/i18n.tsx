@@ -336,7 +336,8 @@ const en: Translations = {
     howItWorks: 'How It Works',
     howItWorksDesc:
       'The family tree data flows through a pipeline entirely in your browser:',
-    pipeline: 'JSON → Brotli Compress → AES-256-GCM Encrypt → Base64url → URL Hash',
+    pipeline:
+      'JSON → Brotli Compress → AES-256-GCM Encrypt → Base64url → URL Hash',
     layoutAlgorithm: 'Layout Algorithm',
     layoutAlgorithmDesc:
       'The tree visualization uses the Buchheim-Reingold-Tilford algorithm — an O(n) layout that guarantees parents are centred over their children, subtrees never overlap, and identical subtrees are drawn identically. Spouse pairs are merged into couple containers.',
@@ -345,7 +346,7 @@ const en: Translations = {
       'AES-256-GCM via the Web Crypto API. Keys are derived with PBKDF2 (600,000 iterations). Each save generates a fresh random salt (16 bytes) and IV (12 bytes). The passphrase never leaves memory.',
     compression: 'Compression',
     compressionDesc:
-      'Brotli compression (quality 11) via WebAssembly — runs before encryption because encrypted bytes have maximum entropy and don\'t compress. This maximises space savings within the ~8 KB URL limit.',
+      "Brotli compression (quality 11) via WebAssembly — runs before encryption because encrypted bytes have maximum entropy and don't compress. This maximises space savings within the ~8 KB URL limit.",
     privacy: 'Privacy',
     privacyDesc:
       'No server. No cookies. No tracking. No analytics. Your data never leaves the browser. The passphrase is held in memory only and cleared when you lock the tree.',
@@ -506,8 +507,7 @@ const ar: Translations = {
     whatIsRootsDesc:
       'جذور هو تطبيق لعرض شجرة العائلة بدون خوادم. يتم تشفير شجرة عائلتك بالكامل وتخزينها في الرابط — بدون خوادم، بدون قواعد بيانات، بدون حسابات. شارك الرابط وكلمة المرور، وسيتمكن أفراد عائلتك من عرض الشجرة وتعديلها.',
     howItWorks: 'كيف يعمل',
-    howItWorksDesc:
-      'تمر بيانات شجرة العائلة عبر خط أنابيب بالكامل في متصفحك:',
+    howItWorksDesc: 'تمر بيانات شجرة العائلة عبر خط أنابيب بالكامل في متصفحك:',
     pipeline: 'JSON → ضغط Brotli → تشفير AES-256-GCM → Base64url → رابط URL',
     layoutAlgorithm: 'خوارزمية التخطيط',
     layoutAlgorithmDesc:
@@ -679,11 +679,12 @@ const tr: Translations = {
     title: 'Kökler Hakkında',
     whatIsRoots: 'Kökler Nedir?',
     whatIsRootsDesc:
-      'Kökler, sunucusuz bir aile ağacı görselleştiricisidir. Aile ağacınızın tamamı şifrelenerek URL\'de saklanır — sunucu yok, veritabanı yok, hesap yok. Bir bağlantı ve parola paylaşın, aileniz ağacı görüntüleyip düzenleyebilsin.',
+      "Kökler, sunucusuz bir aile ağacı görselleştiricisidir. Aile ağacınızın tamamı şifrelenerek URL'de saklanır — sunucu yok, veritabanı yok, hesap yok. Bir bağlantı ve parola paylaşın, aileniz ağacı görüntüleyip düzenleyebilsin.",
     howItWorks: 'Nasıl Çalışır',
     howItWorksDesc:
       'Aile ağacı verileri tamamen tarayıcınızda bir işlem hattından geçer:',
-    pipeline: 'JSON → Brotli Sıkıştırma → AES-256-GCM Şifreleme → Base64url → URL Hash',
+    pipeline:
+      'JSON → Brotli Sıkıştırma → AES-256-GCM Şifreleme → Base64url → URL Hash',
     layoutAlgorithm: 'Yerleşim Algoritması',
     layoutAlgorithmDesc:
       'Ağaç görselleştirmesi Buchheim-Reingold-Tilford algoritmasını kullanır — ebeveynlerin çocuklarının üzerinde ortalandığını, alt ağaçların hiç çakışmadığını ve özdeş alt ağaçların aynı şekilde çizildiğini garanti eden O(n) bir yerleşim.',

@@ -34,7 +34,7 @@ Please include:
 For context, here is how Roots handles encryption:
 
 | Component | Detail |
-|-----------|--------|
+| --- | --- |
 | Algorithm | AES-256-GCM (authenticated encryption) |
 | Key derivation | PBKDF2, 600,000 iterations, SHA-256 |
 | Salt | 16 bytes, randomly generated per save |
@@ -58,7 +58,7 @@ The following are in scope for security reports:
 
 ## Supported Versions
 
-| Version | Supported |
-|---------|-----------|
-| Latest (`main` branch) | Yes |
-| Older releases | Best-effort |
+| Version                | Supported   |
+| ---------------------- | ----------- |
+| Latest (`main` branch) | Yes         |
+| Older releases         | Best-effort |

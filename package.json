@@ -23,6 +23,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "deploy": "npm run build && wrangler pages deploy",
     "dev": "vite",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"

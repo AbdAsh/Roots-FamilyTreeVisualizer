@@ -46,7 +46,9 @@ function Section({
         </div>
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-cream mb-1">{title}</h3>
-          <div className="text-xs text-cream/50 leading-relaxed">{children}</div>
+          <div className="text-xs text-cream/50 leading-relaxed">
+            {children}
+          </div>
         </div>
       </div>
     </div>
@@ -160,8 +162,12 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
             AM
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-cream">{about.developer}</p>
-            <p className="text-[11px] text-cream/40 mb-2">{about.developerRole}</p>
+            <p className="text-sm font-semibold text-cream">
+              {about.developer}
+            </p>
+            <p className="text-[11px] text-cream/40 mb-2">
+              {about.developerRole}
+            </p>
             <div className="flex flex-wrap gap-2">
               <a
                 href="https://abdash.net"
