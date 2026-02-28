@@ -1,2 +1,2 @@
-# Netlify / Cloudflare Pages SPA redirect — send all paths to index.html
-/*  /index.html   200
+# SPA redirect for Netlify (Cloudflare Pages uses not_found_handling in wrangler.jsonc)
+# /*  /index.html   200
