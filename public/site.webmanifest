@@ -1,11 +1,14 @@
 {
-  "name": "Roots — Family Tree Visualizer",
+  "name": "Roots — Free Family Tree Maker & Genealogy Chart Creator",
   "short_name": "Roots",
-  "description": "Zero-backend, encrypted family tree visualizer stored entirely in the URL",
+  "description": "Free online family tree maker, genealogy chart creator, and ancestor tree visualizer. Build encrypted family tree diagrams, pedigree charts, descendant charts, and lineage diagrams — no accounts, no servers. شجرة العائلة | soy ağacı oluşturucu",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a1a",
   "theme_color": "#1a1a1a",
+  "lang": "en",
+  "dir": "auto",
+  "categories": ["lifestyle", "utilities", "education"],
   "icons": [
     {
       "src": "/favicon.svg",

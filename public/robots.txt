@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Sitemaps
 Sitemap: https://roots.abdash.net/sitemap.xml
+
+# Host
+Host: https://roots.abdash.net
