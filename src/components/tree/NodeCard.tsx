@@ -152,6 +152,20 @@ export function NodeCard({
     if (isNew) nameInputRef.current?.focus();
   }, [isNew]);
 
+  /* ── Active-card focus management (a11y) ── */
+  // Move focus into the active card when this node transitions from compact→active.
+  // We track the previous isActive value to fire only on the rising edge (false→true),
+  // not on every re-render while the card is already active.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const prevActiveRef = useRef(false);
+
+  useEffect(() => {
+    if (isActive && !prevActiveRef.current) {
+      containerRef.current?.focus();
+    }
+    prevActiveRef.current = isActive;
+  }, [isActive]);
+
   const commitNew = () => {
     const name = draftName.trim();
     if (!name) {
@@ -263,10 +277,12 @@ export function NodeCard({
   if (isActive) {
     return (
       <motion.div
+        ref={containerRef}
         layout={!reduce}
         initial={false}
         role="group"
         aria-label={node.member.name}
+        tabIndex={-1}
         className={`relative flex flex-col gap-3 w-60 p-4 rounded-xl bg-charcoal-light
           border border-amber/60 shadow-md ${centered ? 'mx-auto' : ''}`}
       >
@@ -302,6 +318,7 @@ export function NodeCard({
         </div>
 
         {/* Gender segmented control */}
+        {/* NOTE: each gender change is its own undo step (updateMember snapshots per call). Acceptable for a discrete choice; revisit if field-edit coalescing is added. */}
         <GenderControl
           value={node.member.gender}
           onChange={(g) => updateMember(node.id, { gender: g })}
