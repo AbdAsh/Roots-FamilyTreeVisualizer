@@ -8,7 +8,7 @@ interface ShortcutOptions {
 
 /**
  * Global keyboard shortcuts:
- * - Escape: close panels / clear search
+ * - Escape: close details modal → deselect member → blur search
  * - Delete/Backspace: delete selected member (triggers confirm)
  * - Ctrl/⌘ + Z: undo
  * - Ctrl/⌘ + Shift + Z / Ctrl/⌘ + Y: redo
@@ -18,12 +18,10 @@ export function useKeyboardShortcuts({
   searchInputRef,
   onDeleteSelected,
 }: ShortcutOptions) {
-  const setEditing = useTreeStore((s) => s.setEditing);
-  const setAddingFor = useTreeStore((s) => s.setAddingFor);
-  const selectMember = useTreeStore((s) => s.selectMember);
+  const detailsForId = useTreeStore((s) => s.detailsForId);
+  const openDetails = useTreeStore((s) => s.openDetails);
   const selectedMemberId = useTreeStore((s) => s.selectedMemberId);
-  const isEditing = useTreeStore((s) => s.isEditing);
-  const addingFor = useTreeStore((s) => s.addingForMemberId);
+  const selectMember = useTreeStore((s) => s.selectMember);
   const undo = useTreeStore((s) => s.undo);
   const redo = useTreeStore((s) => s.redo);
 
@@ -38,14 +36,17 @@ export function useKeyboardShortcuts({
 
       const mod = e.metaKey || e.ctrlKey;
 
-      // Escape — close panels
+      // Escape — close details modal → deselect node → blur search
       if (e.key === 'Escape') {
-        if (addingFor) {
-          setAddingFor(null);
-        } else if (isEditing) {
-          setEditing(false);
+        if (detailsForId) {
+          openDetails(null);
+          return;
+        }
+        if (selectedMemberId) {
           selectMember(null);
-        } else if (
+          return;
+        }
+        if (
           searchInputRef.current &&
           document.activeElement === searchInputRef.current
         ) {
@@ -86,11 +87,9 @@ export function useKeyboardShortcuts({
       }
     },
     [
-      addingFor,
-      isEditing,
+      detailsForId,
+      openDetails,
       selectedMemberId,
-      setAddingFor,
-      setEditing,
       selectMember,
       undo,
       redo,

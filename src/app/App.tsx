@@ -23,6 +23,7 @@ import { DetailsModal } from '@/components/editor/DetailsModal';
 import { Legend } from '@/components/ui/Legend';
 import { ExportImportBar } from '@/components/ui/ExportImportBar';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { HintBar } from '@/components/ui/HintBar';
 import { Button } from '@/components/ui/Button';
 import { useTreeStore } from '@/hooks/useTree';
 import { useAuthStore } from '@/hooks/useAuth';
@@ -230,14 +231,8 @@ export default function App() {
         {tree && <Legend />}
       </main>
 
-      {/* Hint bar (bottom) */}
-      {tree && tree.members.length === 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 animate-fade-in">
-          <div className="px-5 py-2.5 bg-charcoal-light border border-charcoal-lighter rounded-full text-xs text-cream-dark shadow-sm">
-            {strings.app.hintAddRelative}
-          </div>
-        </div>
-      )}
+      {/* Hint bar (bottom) — walkthrough HintBar replaces the old single-member pill */}
+      <HintBar />
 
       {/* Share Modal */}
       <ShareModal isOpen={shareOpen} onClose={() => setShareOpen(false)} />

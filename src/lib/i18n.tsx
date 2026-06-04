@@ -234,6 +234,11 @@ export interface Translations {
     redo: string;
     search: string;
   };
+  // Walkthrough hints (HintBar)
+  hints: {
+    addRelatives: string;
+    share: string;
+  };
 }
 
 /* ─── English ─── */
@@ -432,6 +437,12 @@ const en: Translations = {
     redo: 'Redo',
     search: 'Focus search',
   },
+  hints: {
+    addRelatives:
+      'Tap a person, then use + to add parents, a partner, children, or siblings.',
+    share:
+      'Share copies a link — anyone with it and the passphrase can view and edit.',
+  },
 };
 
 /* ─── Arabic ─── */
@@ -625,6 +636,12 @@ const ar: Translations = {
     undo: 'تراجع',
     redo: 'إعادة',
     search: 'البحث',
+  },
+  hints: {
+    addRelatives:
+      'اضغط على شخص، ثم استخدم + لإضافة والدين أو شريك أو أبناء أو أشقاء.',
+    share:
+      'المشاركة تنسخ رابطاً — يستطيع أي شخص يمتلكه مع عبارة المرور العرض والتعديل.',
   },
 };
 
@@ -826,6 +843,12 @@ const tr: Translations = {
     undo: 'Geri al',
     redo: 'Yinele',
     search: 'Aramaya odaklan',
+  },
+  hints: {
+    addRelatives:
+      'Bir kişiye dokunun, ardından ebeveyn, partner, çocuk veya kardeş eklemek için + kullanın.',
+    share:
+      'Paylaş bir bağlantı kopyalar — bağlantıya ve parolaya sahip herkes görüntüleyip düzenleyebilir.',
   },
 };
 

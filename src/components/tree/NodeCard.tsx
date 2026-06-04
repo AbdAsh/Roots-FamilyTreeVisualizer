@@ -9,8 +9,9 @@
  *                 (→ `openDetails`) and the directional `<AddAffordances>`.
  *  - **new**      (`mode='new'`) creation card: name autofocused, Enter/✓ commits,
  *                 Esc/✕ cancels. First-person commit → `addMember`; relative commit
- *                 → `addRelativeBatch(relativeTo, newRelType, member, [])` (inferred
- *                 chips deferred to a later task) then selects the new member.
+ *                 → `addRelativeBatch(relativeTo, newRelType, member, inferred)`
+ *                 then selects the new member. Inferred-link chips are rendered and
+ *                 resolved at commit time.
  *
  * Editorial paper aesthetic: hairline borders, Spectral names, Hanken UI, forest
  * accent used only for selection/affordances. No glow/glass/blur/gradient.
