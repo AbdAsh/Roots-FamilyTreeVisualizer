@@ -31,7 +31,8 @@ export function PassphraseScreen() {
   } = useAuthStore();
   const { initTree, setTree } = useTreeStore();
   const { strings } = useI18n();
-  const { theme, toggle: toggleTheme } = useThemeStore();
+  const theme = useThemeStore((s) => s.theme);
+  const toggleTheme = useThemeStore((s) => s.toggle);
 
   const [passphrase, setPassphrase] = useState('');
   const [familyName, setFamilyName] = useState('');
@@ -103,6 +104,7 @@ export function PassphraseScreen() {
           size="sm"
           onClick={toggleTheme}
           aria-label={strings.app.toggleTheme}
+          title={strings.app.toggleTheme}
         >
           {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
         </Button>

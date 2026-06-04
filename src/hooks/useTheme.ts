@@ -26,6 +26,7 @@ function readInitial(): Theme {
   return 'light';
 }
 
+/** Applies a theme after the initial bootstrap (mirrors the inline script in index.html). */
 function apply(theme: Theme): void {
   if (typeof document === 'undefined') return;
   document.documentElement.setAttribute('data-theme', theme);
@@ -43,5 +44,9 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>((set, get) => ({
   theme: readInitial(),
   setTheme: (t) => { apply(t); set({ theme: t }); },
-  toggle: () => { const n: Theme = get().theme === 'dark' ? 'light' : 'dark'; apply(n); set({ theme: n }); },
+  toggle: () => {
+    const next: Theme = get().theme === 'dark' ? 'light' : 'dark';
+    apply(next);
+    set({ theme: next });
+  },
 }));

@@ -46,7 +46,8 @@ export default function App() {
   const removeMember = useTreeStore((s) => s.removeMember);
 
   const { strings } = useI18n();
-  const { theme, toggle: toggleTheme } = useThemeStore();
+  const theme = useThemeStore((s) => s.theme);
+  const toggleTheme = useThemeStore((s) => s.toggle);
   const [shareOpen, setShareOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -193,6 +194,7 @@ export default function App() {
             size="sm"
             onClick={toggleTheme}
             aria-label={strings.app.toggleTheme}
+            title={strings.app.toggleTheme}
           >
             {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
           </Button>
