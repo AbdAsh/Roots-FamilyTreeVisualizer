@@ -18,14 +18,14 @@
  *
  * @module NodeCard
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 
-import type { PositionedNode } from '@/lib/tree-utils';
+import { getInferredRelationships, type PositionedNode } from '@/lib/tree-utils';
 import type { Gender } from '@/types/family';
 import { useTreeStore } from '@/hooks/useTree';
-import { useI18n } from '@/lib/i18n';
+import { useI18n, t } from '@/lib/i18n';
 import { Avatar } from '@/components/ui/Avatar';
 import { AddAffordances, type RelType } from '@/components/tree/AddAffordances';
 
@@ -131,6 +131,7 @@ export function NodeCard({
   const openDetails = useTreeStore((s) => s.openDetails);
   const addMember = useTreeStore((s) => s.addMember);
   const addRelativeBatch = useTreeStore((s) => s.addRelativeBatch);
+  const tree = useTreeStore((s) => s.tree);
 
   const reduce = useReducedMotion();
   const isNew = mode === 'new';
@@ -147,6 +148,29 @@ export function NodeCard({
   const [draftName, setDraftName] = useState('');
   const [draftGender, setDraftGender] = useState<Gender>('unknown');
   const nameInputRef = useRef<HTMLInputElement>(null);
+
+  /* ── Inferred suggestions (new-card, relative path only) ── */
+  const suggestions = useMemo(() => {
+    if (!isNew || !relativeTo || !newRelType || !tree) return [];
+    return getInferredRelationships(relativeTo, newRelType, tree);
+  }, [isNew, relativeTo, newRelType, tree]);
+
+  // enabled set: all keys ON by default whenever suggestions change
+  const [enabledSuggestions, setEnabledSuggestions] = useState<Set<string>>(
+    () => new Set<string>(),
+  );
+  useEffect(() => {
+    setEnabledSuggestions(new Set(suggestions.map((s) => s.key)));
+  }, [suggestions]);
+
+  const toggleSuggestion = (key: string) => {
+    setEnabledSuggestions((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (isNew) nameInputRef.current?.focus();
@@ -175,8 +199,15 @@ export function NodeCard({
     const data = { name, gender: draftGender, customFields: {} };
     let newId: string;
     if (relativeTo && newRelType) {
-      // Inferred chips deferred — commit with an EMPTY inferred list for now.
-      const created = addRelativeBatch(relativeTo, newRelType, data, []);
+      // Map enabled suggestions to the new-signature format expected by addRelativeBatch.
+      const resolved = suggestions
+        .filter((s) => enabledSuggestions.has(s.key))
+        .map((s) => ({
+          type: s.relType,
+          existingId: s.existingMemberId,
+          newIsFrom: s.newMemberIsFrom,
+        }));
+      const created = addRelativeBatch(relativeTo, newRelType, data, resolved);
       newId = created.id;
     } else {
       const created = addMember(data); // first person → becomes root
@@ -243,6 +274,38 @@ export function NodeCard({
           labels={genderLabels}
           groupLabel={strings.editor.gender}
         />
+
+        {/* Inferred-link toggle chips — only shown when there are suggestions */}
+        {suggestions.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-body uppercase tracking-wider text-cream-dark">
+              {strings.addRelative.additionalRels}
+            </span>
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label={strings.addRelative.additionalRels}>
+              {suggestions.map((s) => {
+                const on = enabledSuggestions.has(s.key);
+                return (
+                  <button
+                    key={s.key}
+                    type="button"
+                    role="switch"
+                    aria-checked={on}
+                    aria-label={t(strings.addRelative[s.labelType], { name: s.existingMemberName })}
+                    onClick={() => toggleSuggestion(s.key)}
+                    className={`inline-flex items-center h-6 px-2 rounded-full border text-[10px] font-body
+                      transition-colors cursor-pointer
+                      ${on
+                        ? 'border-amber/60 bg-amber/10 text-amber'
+                        : 'border-charcoal-lighter bg-transparent text-cream-dark/50'
+                      }`}
+                  >
+                    {t(strings.addRelative[s.labelType], { name: s.existingMemberName })}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center gap-2 pt-0.5">
           <button

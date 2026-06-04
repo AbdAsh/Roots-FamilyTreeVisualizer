@@ -94,12 +94,17 @@ interface TreeState {
   /**
    * Batch add: creates a member + primary relationship + resolved inferred relationships
    * under a SINGLE snapshot (one undo step).
+   *
+   * The `inferred` items use `existingId` (the already-existing member) and
+   * `newIsFrom` to describe which side of the relationship the NEW member occupies.
+   * The action resolves concrete `from`/`to` internally once it has generated the
+   * new member's id.
    */
   addRelativeBatch: (
     relativeTo: string,
     relType: 'parent' | 'child' | 'spouse' | 'sibling',
     member: Omit<FamilyMember, 'id'>,
-    inferred: { type: RelationshipType; from: string; to: string }[],
+    inferred: { type: RelationshipType; existingId: string; newIsFrom: boolean }[],
   ) => FamilyMember;
 
   // Undo / Redo
@@ -348,9 +353,12 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       else if (relType === 'child') add('parent-child', relativeTo, member.id);
       else if (relType === 'spouse') add('spouse', relativeTo, member.id);
       else add('sibling', relativeTo, member.id);
-      // inferred (already resolved to concrete {type, from, to} by the caller,
-      // substituting the new member id where needed)
-      for (const r of inferred) add(r.type, r.from, r.to);
+      // inferred: resolve concrete from/to now that we have the new member's id
+      for (const r of inferred) {
+        const from = r.newIsFrom ? member.id : r.existingId;
+        const to = r.newIsFrom ? r.existingId : member.id;
+        add(r.type, from, to);
+      }
       return {
         ...pushSnapshot(state),
         tree: {
