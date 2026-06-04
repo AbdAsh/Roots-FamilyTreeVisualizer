@@ -4,6 +4,8 @@ import { useTreeStore } from '@/hooks/useTree';
 import { useI18n } from '@/lib/i18n';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { FamilyTreeSchema } from '@/lib/validation';
+import { computeTieredLayout } from '@/lib/tree-utils';
+import { renderTreeSvg, type ExportTheme } from '@/lib/tree-export';
 
 export function ExportImportBar() {
   const tree = useTreeStore((s) => s.tree);
@@ -64,96 +66,38 @@ export function ExportImportBar() {
     }
   }, [setTree]);
 
-  /* ── Shared export helper ── */
-  // Builds a self-contained SVG clone ready for file export.
-  // Resolves CSS variables, strips interactive UI elements, and removes
-  // the pan/zoom transform so the viewBox positions content correctly.
-  const buildExportClone = useCallback((): {
-    clone: SVGSVGElement;
-    width: number;
-    height: number;
-  } | null => {
-    // Target by id so we always get the tree SVG, not a Lucide icon SVG
-    const svg = document.getElementById('tree-svg') as SVGSVGElement | null;
-    if (!svg) return null;
-
-    const g = svg.querySelector('.tree-root') as SVGGElement | null;
-    if (!g) return null;
-
-    const bbox = g.getBBox();
-    const pad = 40;
-    const w = bbox.width + pad * 2;
-    const h = bbox.height + pad * 2;
-
-    const clone = svg.cloneNode(true) as SVGSVGElement;
-    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    clone.setAttribute('width', String(w));
-    clone.setAttribute('height', String(h));
-    clone.setAttribute('viewBox', `${bbox.x - pad} ${bbox.y - pad} ${w} ${h}`);
-    // Remove pan/zoom transform — viewBox handles positioning now
-    const cloneG = clone.querySelector('.tree-root') as SVGGElement | null;
-    if (cloneG) cloneG.removeAttribute('transform');
-
-    // Strip interactive buttons that shouldn't appear in exports
-    clone.querySelectorAll('.add-btn, .del-btn').forEach((el) => el.remove());
-
-    // Resolve CSS custom properties to literal values so the exported file
-    // renders correctly without the app's stylesheet
-    const root = getComputedStyle(document.documentElement);
-    const colorCharcoal =
-      root.getPropertyValue('--color-charcoal').trim() || '#1a1a2e';
-    const colorCharcoalLight =
-      root.getPropertyValue('--color-charcoal-light').trim() || '#2a2a3e';
-    clone.querySelectorAll('*').forEach((el) => {
-      const fill = el.getAttribute('fill');
-      if (fill === 'var(--color-charcoal)')
-        el.setAttribute('fill', colorCharcoal);
-      if (fill && fill.startsWith('var(--color-charcoal-light'))
-        el.setAttribute('fill', colorCharcoalLight);
-    });
-    // Replace font-family CSS var references in text elements
-    clone.querySelectorAll('text').forEach((el) => {
-      const ff = el.getAttribute('fontFamily');
-      if (ff === 'var(--font-display)')
-        el.setAttribute('fontFamily', "'Playfair Display', Georgia, serif");
-      if (ff === 'var(--font-body)')
-        el.setAttribute('fontFamily', "'DM Sans', system-ui, sans-serif");
-    });
-
-    // Inject styles for CSS classes used on link paths
-    const style = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'style',
-    );
-    style.textContent = [
-      '.tree-link-parent-child{stroke:#d4a574;stroke-width:1.5;fill:none;opacity:.6;}',
-      '.tree-link-spouse{stroke:#8b4557;stroke-width:1.5;stroke-dasharray:6 4;fill:none;opacity:.6;}',
-      '.tree-link-sibling{stroke:#8fa68a;stroke-width:1;stroke-dasharray:2 3;fill:none;opacity:.5;}',
-    ].join('');
-    clone.insertBefore(style, clone.firstChild);
-
-    // Dark background rect
-    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    bg.setAttribute('x', String(bbox.x - pad));
-    bg.setAttribute('y', String(bbox.y - pad));
-    bg.setAttribute('width', String(w));
-    bg.setAttribute('height', String(h));
-    bg.setAttribute('fill', '#1a1a1a');
-    clone.insertBefore(bg, clone.firstChild);
-
-    return { clone, width: w, height: h };
-  }, []);
+  /* ── Theme reader ── */
+  // Reads current CSS custom properties into an ExportTheme so the exported
+  // SVG matches the live light/dark theme exactly.
+  function readExportTheme(): ExportTheme {
+    const r = getComputedStyle(document.documentElement);
+    const v = (name: string, fallback: string) =>
+      r.getPropertyValue(name).trim() || fallback;
+    return {
+      bg: v('--color-charcoal', '#18181b'),
+      ink: v('--color-cream', '#f5f0e8'),
+      inkDim: v('--color-cream-dark', '#c8b89a'),
+      surface: v('--tree-surface', '#2a2a2a'),
+      hairline: v('--color-charcoal-lighter', '#3a3a3a'),
+      accent: v('--color-amber', '#d4a574'),
+      link: v('--tree-link', '#d4a574'),
+      linkRef: v('--tree-link-ref', '#8fa68a'),
+      fontDisplay: v('--font-display', 'Georgia, serif'),
+      fontBody: v('--font-body', 'system-ui, sans-serif'),
+    };
+  }
 
   /* ── PNG Export ── */
   const handleExportPng = useCallback(() => {
-    const result = buildExportClone();
-    if (!result) return;
-    const { clone, width, height } = result;
+    if (!tree) return;
+    const layout = computeTieredLayout(tree);
+    if (!layout) return;
+    const theme = readExportTheme();
+    const { svg, width, height } = renderTreeSvg(layout, theme);
 
-    const svgString = new XMLSerializer().serializeToString(clone);
     // Use a data URI instead of a blob URL to avoid tainted-canvas security
     // restrictions that block toBlob() when an image was loaded cross-origin.
-    const dataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgString)))}`;
+    const dataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
 
     const img = new window.Image();
     img.onload = () => {
@@ -170,7 +114,7 @@ export function ExportImportBar() {
         const dl = URL.createObjectURL(b);
         const a = document.createElement('a');
         a.href = dl;
-        a.download = `${tree?.name.replace(/\s+/g, '_') ?? 'family_tree'}.png`;
+        a.download = `${tree.name.replace(/\s+/g, '_') ?? 'family_tree'}.png`;
         a.click();
         URL.revokeObjectURL(dl);
       }, 'image/png');
@@ -178,23 +122,24 @@ export function ExportImportBar() {
     img.onerror = () =>
       console.error('[FamilyTree] PNG export: SVG failed to load into <img>');
     img.src = dataUrl;
-  }, [tree, buildExportClone]);
+  }, [tree]);
 
   /* ── SVG Export ── */
   const handleExportSvg = useCallback(() => {
-    const result = buildExportClone();
-    if (!result) return;
-    const { clone } = result;
+    if (!tree) return;
+    const layout = computeTieredLayout(tree);
+    if (!layout) return;
+    const theme = readExportTheme();
+    const { svg } = renderTreeSvg(layout, theme);
 
-    const svgString = new XMLSerializer().serializeToString(clone);
-    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${tree?.name.replace(/\s+/g, '_') ?? 'family_tree'}.svg`;
+    a.download = `${tree.name.replace(/\s+/g, '_') ?? 'family_tree'}.svg`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [tree, buildExportClone]);
+  }, [tree]);
 
   const btnCls =
     'h-8 px-2.5 rounded-lg bg-charcoal-light/80 border border-charcoal-lighter text-cream/50 hover:text-cream hover:border-amber/30 flex items-center gap-1.5 text-[11px] font-medium transition-all cursor-pointer';
