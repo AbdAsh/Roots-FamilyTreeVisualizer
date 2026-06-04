@@ -29,13 +29,7 @@ interface TreeState {
   tree: FamilyTree | null;
   /** ID of the currently selected member in the tree view. */
   selectedMemberId: string | null;
-  // TODO(B8): remove after consumers migrate to detailsForId
-  /** @deprecated Use `detailsForId` instead. Whether the edit panel is open. */
-  isEditing: boolean;
-  // TODO(B8): remove after consumers migrate to detailsForId
-  /** @deprecated Use `detailsForId` instead. Member ID for which the "add relative" modal is open, or `null`. */
-  addingForMemberId: string | null;
-  /** ID of the member whose details modal is open, or `null`. Part of the new selection model (B task). */
+  /** ID of the member whose details modal is open, or `null`. */
   detailsForId: string | null;
 
   /** @internal Undo stack — serialised JSON snapshots of past tree states. */
@@ -72,12 +66,6 @@ interface TreeState {
   // Selection
   /** Select a member (or deselect by passing `null`). Sets selectedMemberId only — does not open any panel. */
   selectMember: (id: string | null) => void;
-  // TODO(B8): remove after consumers migrate to detailsForId
-  /** @deprecated Use `openDetails` instead. Toggle the edit panel open/closed. */
-  setEditing: (editing: boolean) => void;
-  // TODO(B8): remove after consumers migrate to detailsForId
-  /** @deprecated Use `openDetails` instead. Open/close the "add relative" modal for a given member. */
-  setAddingFor: (memberId: string | null) => void;
   /** Open or close the details modal for the given member ID (pass `null` to close). */
   openDetails: (id: string | null) => void;
 
@@ -157,8 +145,6 @@ function hasDuplicate(
 export const useTreeStore = create<TreeState>((set, get) => ({
   tree: null,
   selectedMemberId: null,
-  isEditing: false,       // TODO(B8): remove after consumers migrate to detailsForId
-  addingForMemberId: null, // TODO(B8): remove after consumers migrate to detailsForId
   detailsForId: null,
   _past: [],
   _future: [],
@@ -183,8 +169,6 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     set({
       tree: null,
       selectedMemberId: null,
-      isEditing: false,       // TODO(B8): remove after consumers migrate to detailsForId
-      addingForMemberId: null, // TODO(B8): remove after consumers migrate to detailsForId
       detailsForId: null,
       _past: [],
       _future: [],
@@ -268,7 +252,6 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         },
         selectedMemberId:
           state.selectedMemberId === id ? null : state.selectedMemberId,
-        isEditing: state.selectedMemberId === id ? false : state.isEditing, // TODO(B8): remove after consumers migrate
         detailsForId: state.detailsForId === id ? null : state.detailsForId,
       };
     });
@@ -307,12 +290,6 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   },
 
   selectMember: (id) => set({ selectedMemberId: id }),
-
-  // TODO(B8): remove after consumers migrate to detailsForId
-  setEditing: (editing) => set({ isEditing: editing, addingForMemberId: null }),
-  // TODO(B8): remove after consumers migrate to detailsForId
-  setAddingFor: (memberId) =>
-    set({ addingForMemberId: memberId, isEditing: false }),
 
   openDetails: (id) => set({ detailsForId: id }),
 
