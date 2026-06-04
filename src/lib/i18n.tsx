@@ -61,6 +61,7 @@ export interface Translations {
     clearSearch: string;
     noMembers: string;
     hintAddRelative: string;
+    firstPersonPrompt: string;
     language: string;
     toggleTheme: string;
   };
@@ -248,6 +249,7 @@ const en: Translations = {
     noMembers: 'No family members yet',
     hintAddRelative:
       'Click ＋ on a node to add relatives, or click the node to edit',
+    firstPersonPrompt: 'Add the first person — usually you',
     language: 'Language',
     toggleTheme: 'Toggle theme',
   },
@@ -445,6 +447,7 @@ const ar: Translations = {
     noMembers: 'لا يوجد أفراد في العائلة بعد',
     hintAddRelative:
       'انقر على ＋ بجانب العقدة لإضافة أقارب، أو انقر على العقدة للتعديل',
+    firstPersonPrompt: 'أضف أول شخص — غالباً أنت',
     language: 'اللغة',
     toggleTheme: 'تبديل السمة',
   },
@@ -638,6 +641,7 @@ const tr: Translations = {
     noMembers: 'Henüz aile üyesi yok',
     hintAddRelative:
       'Akraba eklemek için düğümdeki ＋ işaretine, düzenlemek için düğüme tıklayın',
+    firstPersonPrompt: 'İlk kişiyi ekleyin — genellikle siz',
     language: 'Dil',
     toggleTheme: 'Temayı değiştir',
   },
