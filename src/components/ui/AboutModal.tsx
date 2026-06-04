@@ -1,6 +1,5 @@
 /**
- * About modal — explains Roots' functionality, algorithms, encryption,
- * compression methods, and credits the developer.
+ * About modal — plain-language explanation of how Roots works.
  *
  * Triggered by the "About" button in the header. Uses the base {@link Modal} component.
  *
@@ -10,17 +9,15 @@ import { Modal } from '@/components/ui/Modal';
 import { useI18n } from '@/lib/i18n';
 import {
   TreePine,
-  Shield,
-  Cpu,
+  Link2,
   Lock,
-  Archive,
-  EyeOff,
-  Code2,
+  Share2,
+  Download,
+  Languages,
   Github,
   Linkedin,
   Globe,
   ExternalLink,
-  ArrowRight,
 } from 'lucide-react';
 
 interface AboutModalProps {
@@ -65,82 +62,36 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
     <Modal isOpen={isOpen} onClose={onClose} title={about.title}>
       <div className="flex flex-col gap-5 max-h-[70vh] overflow-y-auto pr-1 -mr-1 custom-scrollbar">
         {/* What is Roots */}
-        <Section icon={<TreePine size={14} />} title={about.whatIsRoots}>
-          <p>{about.whatIsRootsDesc}</p>
+        <Section icon={<TreePine size={14} />} title={about.whatTitle}>
+          <p>{about.whatBody}</p>
         </Section>
 
-        {/* How It Works */}
-        <Section icon={<Cpu size={14} />} title={about.howItWorks}>
-          <p className="mb-2">{about.howItWorksDesc}</p>
-          <div className="px-3 py-2 rounded-md bg-charcoal border border-charcoal-lighter font-mono text-[10px] text-amber flex items-center gap-1 flex-wrap">
-            <span>JSON</span>
-            <ArrowRight size={10} className="text-cream-dark rtl:rotate-180" />
-            <span>Brotli</span>
-            <ArrowRight size={10} className="text-cream-dark rtl:rotate-180" />
-            <span>AES-GCM</span>
-            <ArrowRight size={10} className="text-cream-dark rtl:rotate-180" />
-            <span>Base64url</span>
-            <ArrowRight size={10} className="text-cream-dark rtl:rotate-180" />
-            <span>URL#</span>
-          </div>
+        {/* The link is the database */}
+        <Section icon={<Link2 size={14} />} title={about.linkTitle}>
+          <p>{about.linkBody}</p>
         </Section>
 
-        {/* Layout Algorithm */}
-        <Section icon={<Code2 size={14} />} title={about.layoutAlgorithm}>
-          <p>{about.layoutAlgorithmDesc}</p>
+        {/* Encrypted with your passphrase */}
+        <Section icon={<Lock size={14} />} title={about.cryptoTitle}>
+          <p>{about.cryptoBody}</p>
         </Section>
 
-        {/* Encryption */}
-        <Section icon={<Lock size={14} />} title={about.encryption}>
-          <p className="mb-2">{about.encryptionDesc}</p>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-cream-dark">
-            <span>Algorithm</span>
-            <span className="text-cream">AES-256-GCM</span>
-            <span>Key derivation</span>
-            <span className="text-cream">PBKDF2 · 600k iterations</span>
-            <span>Salt</span>
-            <span className="text-cream">16 bytes (random)</span>
-            <span>IV</span>
-            <span className="text-cream">12 bytes (random)</span>
-          </div>
+        {/* Sharing */}
+        <Section icon={<Share2 size={14} />} title={about.shareTitle}>
+          <p>{about.shareBody}</p>
         </Section>
 
-        {/* Compression */}
-        <Section icon={<Archive size={14} />} title={about.compression}>
-          <p>{about.compressionDesc}</p>
+        {/* Export & import */}
+        <Section icon={<Download size={14} />} title={about.exportTitle}>
+          <p>{about.exportBody}</p>
         </Section>
 
-        {/* Privacy */}
-        <Section icon={<EyeOff size={14} />} title={about.privacy}>
-          <p>{about.privacyDesc}</p>
+        {/* Languages */}
+        <Section icon={<Languages size={14} />} title={about.langTitle}>
+          <p>{about.langBody}</p>
         </Section>
 
-        {/* Tech Stack */}
-        <Section icon={<Shield size={14} />} title={about.techStack}>
-          <div className="flex flex-wrap gap-1.5">
-            {[
-              'React 19',
-              'TypeScript',
-              'Zustand',
-              'D3',
-              'Framer Motion',
-              'Tailwind v4',
-              'Vite 7',
-              'Zod',
-              'Web Crypto',
-              'Brotli WASM',
-            ].map((tech) => (
-              <span
-                key={tech}
-                className="px-2 py-0.5 rounded-md bg-charcoal border border-charcoal-lighter text-[10px] text-cream-dark"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </Section>
-
-        {/* Open Source */}
+        {/* Open source link */}
         <Section icon={<Github size={14} />} title={about.openSource}>
           <p className="mb-2">{about.openSourceDesc}</p>
           <a
@@ -154,6 +105,11 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <ExternalLink size={10} />
           </a>
         </Section>
+
+        {/* Size footnote */}
+        <p className="text-[10px] text-cream-dark leading-relaxed border-t border-charcoal-lighter pt-4">
+          {about.sizeNote}
+        </p>
 
         {/* Divider */}
         <div className="border-t border-charcoal-lighter" />

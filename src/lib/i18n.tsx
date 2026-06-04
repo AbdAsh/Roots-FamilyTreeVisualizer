@@ -68,6 +68,7 @@ export interface Translations {
   auth: {
     plantTree: string;
     unlockTree: string;
+    conceptLine: string;
     familyName: string;
     familyNamePlaceholder: string;
     passphrase: string;
@@ -180,6 +181,20 @@ export interface Translations {
     viewWebsite: string;
     viewGithub: string;
     viewLinkedin: string;
+    // Plain-language content sections (A5)
+    whatTitle: string;
+    whatBody: string;
+    linkTitle: string;
+    linkBody: string;
+    cryptoTitle: string;
+    cryptoBody: string;
+    shareTitle: string;
+    shareBody: string;
+    exportTitle: string;
+    exportBody: string;
+    langTitle: string;
+    langBody: string;
+    sizeNote: string;
   };
   // Legend
   legend: {
@@ -239,6 +254,8 @@ const en: Translations = {
   auth: {
     plantTree: 'Plant your family tree',
     unlockTree: 'Unlock a shared family tree',
+    conceptLine:
+      'Your whole family tree lives inside its own link, locked by a passphrase. No accounts, no servers.',
     familyName: 'Family Name',
     familyNamePlaceholder: 'The Smith Family',
     passphrase: 'Passphrase',
@@ -363,6 +380,23 @@ const en: Translations = {
     viewWebsite: 'Website',
     viewGithub: 'GitHub',
     viewLinkedin: 'LinkedIn',
+    whatTitle: 'What is Roots?',
+    whatBody: 'A private family-tree maker that runs entirely in your browser.',
+    linkTitle: 'The link is the database',
+    linkBody:
+      "Your tree is compressed and packed into the page link itself — there's no server storing it.",
+    cryptoTitle: 'Encrypted with your passphrase',
+    cryptoBody:
+      'The link is encrypted with AES-256-GCM. Your passphrase never leaves your browser; without it the link is unreadable.',
+    shareTitle: 'Sharing',
+    shareBody:
+      'Send someone the link and the passphrase and they can view or edit the tree. Changes live only in their copy of the link.',
+    exportTitle: 'Export & import',
+    exportBody: 'Save your tree as JSON, PNG, or SVG, and import JSON back.',
+    langTitle: 'Languages',
+    langBody: 'English, Arabic (right-to-left), and Turkish.',
+    sizeNote:
+      'Because the whole tree fits in a link, very large trees may hit a size limit.',
   },
   legend: {
     title: 'Legend',
@@ -417,6 +451,8 @@ const ar: Translations = {
   auth: {
     plantTree: 'ازرع شجرة عائلتك',
     unlockTree: 'افتح شجرة عائلة مشتركة',
+    conceptLine:
+      'شجرة عائلتك بأكملها موجودة داخل رابطها الخاص، محمية بعبارة مرور. بلا حسابات، بلا خوادم.',
     familyName: 'اسم العائلة',
     familyNamePlaceholder: 'عائلة الأحمد',
     passphrase: 'كلمة المرور',
@@ -536,6 +572,24 @@ const ar: Translations = {
     viewWebsite: 'الموقع',
     viewGithub: 'GitHub',
     viewLinkedin: 'LinkedIn',
+    whatTitle: 'ما هو جذور؟',
+    whatBody: 'أداة خاصة لإنشاء شجرة العائلة تعمل بالكامل داخل متصفحك.',
+    linkTitle: 'الرابط هو قاعدة البيانات',
+    linkBody:
+      'يتم ضغط شجرتك وتعبئتها داخل رابط الصفحة نفسه — لا يوجد خادم يخزّنها.',
+    cryptoTitle: 'مشفّرة بعبارة مرورك',
+    cryptoBody:
+      'الرابط مشفّر بخوارزمية AES-256-GCM. عبارة مرورك لا تغادر متصفحك أبدًا؛ وبدونها يظل الرابط غير قابل للقراءة.',
+    shareTitle: 'المشاركة',
+    shareBody:
+      'أرسل الرابط وعبارة المرور إلى شخص ما وسيتمكن من عرض الشجرة أو تعديلها. التغييرات تبقى في نسخته الخاصة من الرابط.',
+    exportTitle: 'التصدير والاستيراد',
+    exportBody:
+      'احفظ شجرتك بصيغة JSON أو PNG أو SVG، واستورد ملفات JSON مجددًا.',
+    langTitle: 'اللغات',
+    langBody: 'الإنجليزية، والعربية (من اليمين إلى اليسار)، والتركية.',
+    sizeNote:
+      'نظرًا لأن الشجرة بأكملها تُخزَّن في رابط، فقد تصل الأشجار الكبيرة جدًا إلى حد الحجم المسموح به.',
   },
   legend: {
     title: 'دليل الرموز',
@@ -590,6 +644,8 @@ const tr: Translations = {
   auth: {
     plantTree: 'Aile ağacınızı oluşturun',
     unlockTree: 'Paylaşılan bir aile ağacını açın',
+    conceptLine:
+      'Tüm aile ağacın kendi bağlantısının içinde yaşar, bir parolayla kilitlenir. Hesap yok, sunucu yok.',
     familyName: 'Aile Adı',
     familyNamePlaceholder: 'Yılmaz Ailesi',
     passphrase: 'Parola',
@@ -714,6 +770,25 @@ const tr: Translations = {
     viewWebsite: 'Web Sitesi',
     viewGithub: 'GitHub',
     viewLinkedin: 'LinkedIn',
+    whatTitle: 'Kökler Nedir?',
+    whatBody:
+      'Tamamen tarayıcınızda çalışan, gizli bir aile ağacı oluşturma aracı.',
+    linkTitle: 'Bağlantı veritabanıdır',
+    linkBody:
+      'Ağacınız sıkıştırılarak sayfa bağlantısının içine paketlenir — onu depolayan herhangi bir sunucu yoktur.',
+    cryptoTitle: 'Parolanızla şifreli',
+    cryptoBody:
+      'Bağlantı AES-256-GCM ile şifrelenir. Parolanız tarayıcınızı asla terk etmez; parolasız bağlantı okunamaz.',
+    shareTitle: 'Paylaşım',
+    shareBody:
+      'Birine bağlantıyı ve parolayı gönderin; ağacı görüntüleyebilir veya düzenleyebilir. Değişiklikler yalnızca onların bağlantı kopyasında yaşar.',
+    exportTitle: 'Dışa ve içe aktarma',
+    exportBody:
+      'Ağacınızı JSON, PNG veya SVG olarak kaydedin ve JSON dosyalarını geri içe aktarın.',
+    langTitle: 'Diller',
+    langBody: 'İngilizce, Arapça (sağdan sola) ve Türkçe.',
+    sizeNote:
+      'Tüm ağaç bir bağlantıya sığdığından, çok büyük ağaçlar boyut sınırına ulaşabilir.',
   },
   legend: {
     title: 'Açıklama',

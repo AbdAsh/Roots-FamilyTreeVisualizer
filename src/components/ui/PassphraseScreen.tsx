@@ -127,6 +127,9 @@ export function PassphraseScreen() {
           <p className="mt-2 text-sm text-cream-dark font-body">
             {isNewTree ? strings.auth.plantTree : strings.auth.unlockTree}
           </p>
+          <p className="mt-4 text-xs text-cream-dark font-body leading-relaxed max-w-xs mx-auto">
+            {strings.auth.conceptLine}
+          </p>
         </div>
 
         <div className="flex flex-col gap-5" onKeyDown={handleKeyDown}>
