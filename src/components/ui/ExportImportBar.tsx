@@ -82,8 +82,8 @@ export function ExportImportBar() {
       accent: v('--color-amber', '#d4a574'),
       link: v('--tree-link', '#d4a574'),
       linkRef: v('--tree-link-ref', '#8fa68a'),
-      fontDisplay: v('--font-display', 'Georgia, serif'),
-      fontBody: v('--font-body', 'system-ui, sans-serif'),
+      fontDisplay: v('--font-display', 'Georgia, serif').replace(/"/g, "'"),
+      fontBody: v('--font-body', 'system-ui, sans-serif').replace(/"/g, "'"),
     };
   }
 
