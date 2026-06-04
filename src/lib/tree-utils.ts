@@ -4,8 +4,8 @@
  * This module contains:
  * - **`computeTieredLayout()`** — the public layout entry point. It orchestrates
  *   the union-aware layered engine in `src/lib/layout/` (unions → tiers →
- *   components → per-component contour + ancestor mirror → packing) and emits
- *   pixel coordinates plus `primary`/`reference` links for the renderer.
+ *   components → per-component founder-based descendant layout → packing) and
+ *   emits pixel coordinates plus `primary`/`reference` links for the renderer.
  * - **Graph query helpers** — `getParents()`, `getChildren()`, `getSpouse()`, `getSiblings()`,
  *   `getRelationshipsForMember()`.
  * - **`getInferredRelationships()`** — auto-suggests additional relationships when adding
@@ -289,8 +289,10 @@ export interface TieredLayout {
  *   2. `assignTiers` — union-find generations + longest-path layering;
  *      cycle edges are returned as `referenceEdges`.
  *   3. `connectedComponents` — partition so unreachable clusters still render.
- *   4. `computeUnionLayout` — per-component descendant contour + ancestor
- *      mirror, stitched at the component anchor.
+ *   4. `computeUnionLayout` — per component: find genealogical founders (tops),
+ *      lay each founder's lineage out downward with a Buchheim contour pass over
+ *      an alternating person/union node tree, pack the founder trees, then
+ *      re-centre each union's children under its couple midpoint.
  *   5. Pack components left-to-right with a clear gap; centre around x = 0.
  *   6. Emit `nodes` + `links`; mark cycle/extra-parent edges `kind:'reference'`.
  *
