@@ -40,16 +40,25 @@ export const RelationshipSchema = z.object({
   to: z.string().min(1),
 });
 
-/** Schema for the complete {@link FamilyTree} object. Used to validate JSON imports. */
+/**
+ * Schema for the complete {@link FamilyTree} object. Used to validate JSON imports.
+ *
+ * `members` and `rootMemberId` intentionally have no `.min(1)` so that a freshly
+ * created (empty) tree round-trips correctly. The `.refine` guard ensures that once
+ * members exist, `rootMemberId` must reference one of them.
+ */
 export const FamilyTreeSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1, 'Family name is required'),
   members: z.array(FamilyMemberSchema),
   relationships: z.array(RelationshipSchema),
-  rootMemberId: z.string().min(1),
+  rootMemberId: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
-});
+}).refine(
+  (t) => t.members.length === 0 || t.members.some((m) => m.id === t.rootMemberId),
+  { message: 'rootMemberId must reference an existing member', path: ['rootMemberId'] },
+);
 
 /** Inferred type from FamilyMemberSchema — useful for form input typing. */
 export type FamilyMemberInput = z.infer<typeof FamilyMemberSchema>;
