@@ -351,7 +351,7 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
                       fill="none"
                       stroke="rgba(212,165,116,0.3)"
                       strokeWidth={2}
-                      className="animate-pulse-glow"
+                      className=""
                     />
                   )}
 
