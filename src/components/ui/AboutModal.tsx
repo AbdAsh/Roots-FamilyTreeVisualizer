@@ -41,12 +41,14 @@ function Section({
   return (
     <div className="group">
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 shrink-0 w-7 h-7 rounded-lg bg-amber/10 border border-amber/20 flex items-center justify-center text-amber">
+        <div className="mt-0.5 shrink-0 w-7 h-7 rounded-md border border-charcoal-lighter flex items-center justify-center text-amber">
           {icon}
         </div>
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-cream mb-1">{title}</h3>
-          <div className="text-xs text-cream/50 leading-relaxed">
+          <h3 className="font-display text-base font-medium text-cream mb-1 tracking-tight">
+            {title}
+          </h3>
+          <div className="text-xs text-cream-dark leading-relaxed">
             {children}
           </div>
         </div>
@@ -70,15 +72,15 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
         {/* How It Works */}
         <Section icon={<Cpu size={14} />} title={about.howItWorks}>
           <p className="mb-2">{about.howItWorksDesc}</p>
-          <div className="px-3 py-2 rounded-lg bg-charcoal/60 border border-charcoal-lighter/40 font-mono text-[10px] text-amber/80 flex items-center gap-1 flex-wrap">
+          <div className="px-3 py-2 rounded-md bg-charcoal border border-charcoal-lighter font-mono text-[10px] text-amber flex items-center gap-1 flex-wrap">
             <span>JSON</span>
-            <ArrowRight size={10} className="text-cream/30" />
+            <ArrowRight size={10} className="text-cream-dark rtl:rotate-180" />
             <span>Brotli</span>
-            <ArrowRight size={10} className="text-cream/30" />
+            <ArrowRight size={10} className="text-cream-dark rtl:rotate-180" />
             <span>AES-GCM</span>
-            <ArrowRight size={10} className="text-cream/30" />
+            <ArrowRight size={10} className="text-cream-dark rtl:rotate-180" />
             <span>Base64url</span>
-            <ArrowRight size={10} className="text-cream/30" />
+            <ArrowRight size={10} className="text-cream-dark rtl:rotate-180" />
             <span>URL#</span>
           </div>
         </Section>
@@ -91,15 +93,15 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
         {/* Encryption */}
         <Section icon={<Lock size={14} />} title={about.encryption}>
           <p className="mb-2">{about.encryptionDesc}</p>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-cream/40">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-cream-dark">
             <span>Algorithm</span>
-            <span className="text-cream/60">AES-256-GCM</span>
+            <span className="text-cream">AES-256-GCM</span>
             <span>Key derivation</span>
-            <span className="text-cream/60">PBKDF2 · 600k iterations</span>
+            <span className="text-cream">PBKDF2 · 600k iterations</span>
             <span>Salt</span>
-            <span className="text-cream/60">16 bytes (random)</span>
+            <span className="text-cream">16 bytes (random)</span>
             <span>IV</span>
-            <span className="text-cream/60">12 bytes (random)</span>
+            <span className="text-cream">12 bytes (random)</span>
           </div>
         </Section>
 
@@ -130,7 +132,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
             ].map((tech) => (
               <span
                 key={tech}
-                className="px-2 py-0.5 rounded-md bg-charcoal/60 border border-charcoal-lighter/40 text-[10px] text-cream/50"
+                className="px-2 py-0.5 rounded-md bg-charcoal border border-charcoal-lighter text-[10px] text-cream-dark"
               >
                 {tech}
               </span>
@@ -145,7 +147,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
             href="https://github.com/AbdAsh/FamilyTreeVisualizer"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-[11px] text-amber hover:text-amber-light transition-colors"
+            className="inline-flex items-center gap-1.5 text-[11px] text-amber hover:text-amber-dark transition-colors"
           >
             <Github size={12} />
             AbdAsh/FamilyTreeVisualizer
@@ -154,18 +156,18 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
         </Section>
 
         {/* Divider */}
-        <div className="border-t border-charcoal-lighter/40" />
+        <div className="border-t border-charcoal-lighter" />
 
         {/* Developer */}
         <div className="flex items-start gap-3">
-          <div className="shrink-0 w-10 h-10 rounded-xl bg-amber/10 border border-amber/20 flex items-center justify-center text-amber font-display font-bold text-sm">
+          <div className="shrink-0 w-10 h-10 rounded-md border border-charcoal-lighter flex items-center justify-center text-amber font-display font-bold text-sm">
             AM
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-cream">
+            <p className="font-display text-base font-medium text-cream tracking-tight">
               {about.developer}
             </p>
-            <p className="text-[11px] text-cream/40 mb-2">
+            <p className="text-[11px] text-cream-dark mb-2">
               {about.developerRole}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -173,7 +175,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 href="https://abdash.net"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-charcoal/60 border border-charcoal-lighter/40 text-[10px] text-cream/50 hover:text-amber hover:border-amber/30 transition-colors"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-charcoal border border-charcoal-lighter text-[10px] text-cream-dark hover:text-amber hover:border-amber/40 transition-colors"
               >
                 <Globe size={10} />
                 {about.viewWebsite}
@@ -182,7 +184,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 href="https://github.com/AbdAsh"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-charcoal/60 border border-charcoal-lighter/40 text-[10px] text-cream/50 hover:text-amber hover:border-amber/30 transition-colors"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-charcoal border border-charcoal-lighter text-[10px] text-cream-dark hover:text-amber hover:border-amber/40 transition-colors"
               >
                 <Github size={10} />
                 {about.viewGithub}
@@ -191,7 +193,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 href="https://linkedin.com/in/abdash"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-charcoal/60 border border-charcoal-lighter/40 text-[10px] text-cream/50 hover:text-amber hover:border-amber/30 transition-colors"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-charcoal border border-charcoal-lighter text-[10px] text-cream-dark hover:text-amber hover:border-amber/40 transition-colors"
               >
                 <Linkedin size={10} />
                 {about.viewLinkedin}

@@ -38,18 +38,18 @@ export function ShareModal({ isOpen, onClose }: ShareModalProps) {
       ? 'text-error'
       : capacityPercent > 60
         ? 'text-amber'
-        : 'text-sage-light';
+        : 'text-sage';
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={strings.shareModal.title}>
       <div className="flex flex-col gap-5">
         {/* URL display */}
         <div>
-          <label className="text-[11px] font-medium text-cream/50 uppercase tracking-wider block mb-1.5">
+          <label className="text-[11px] font-medium text-cream-dark uppercase tracking-wider block mb-1.5">
             {strings.shareModal.shareableLink}
           </label>
           <div className="flex gap-2">
-            <div className="flex-1 px-3 py-2 bg-charcoal border border-charcoal-lighter rounded-lg text-xs text-cream/70 truncate font-mono">
+            <div className="flex-1 px-3 py-2 bg-charcoal border border-charcoal-lighter rounded-md text-xs text-cream-dark truncate font-mono">
               {window.location.href.length > 80
                 ? window.location.href.slice(0, 40) +
                   '…' +
@@ -75,14 +75,14 @@ export function ShareModal({ isOpen, onClose }: ShareModalProps) {
         {/* Capacity indicator */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-cream/40">
+            <span className="text-xs text-cream-dark">
               {strings.shareModal.capacityUsed}
             </span>
             <span className={`text-xs font-medium ${capacityColor}`}>
               {capacityPercent}% ({(sizeBytes / 1024).toFixed(1)} KB)
             </span>
           </div>
-          <div className="w-full h-1.5 bg-charcoal rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-charcoal border border-charcoal-lighter rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 capacityPercent > 80
@@ -97,21 +97,21 @@ export function ShareModal({ isOpen, onClose }: ShareModalProps) {
         </div>
 
         {capacityPercent > 80 && (
-          <div className="flex items-start gap-3 p-4 bg-error/5 border border-error/10 rounded-xl">
+          <div className="flex items-start gap-3 p-4 border border-error/30 rounded-md">
             <AlertTriangle size={14} className="text-error shrink-0 mt-0.5" />
-            <p className="text-[11px] text-error/80 leading-relaxed">
+            <p className="text-[11px] text-error leading-relaxed">
               {strings.shareModal.capacityWarning}
             </p>
           </div>
         )}
 
         {/* Instructions */}
-        <div className="p-4 bg-amber/5 border border-amber/10 rounded-xl">
+        <div className="p-4 bg-charcoal border border-charcoal-lighter rounded-md">
           <div className="flex items-start gap-3">
-            <Link size={14} className="text-amber/60 shrink-0 mt-0.5" />
-            <div className="text-[11px] text-cream/50 leading-relaxed space-y-1">
+            <Link size={14} className="text-amber shrink-0 mt-0.5" />
+            <div className="text-[11px] text-cream-dark leading-relaxed space-y-1">
               <p>
-                <strong className="text-cream/70">
+                <strong className="text-cream font-semibold">
                   {strings.shareModal.shareInstructions}
                 </strong>
               </p>

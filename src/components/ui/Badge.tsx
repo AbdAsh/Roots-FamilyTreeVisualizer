@@ -5,11 +5,11 @@ interface BadgeProps {
 }
 
 const variantClasses = {
-  default: 'bg-cream/10 text-cream/70 border-cream/10',
-  amber: 'bg-amber/10 text-amber border-amber/20',
-  sage: 'bg-sage/10 text-sage-light border-sage/20',
-  wine: 'bg-wine/10 text-[#d48a9e] border-wine/20',
-  warning: 'bg-error/10 text-error border-error/20',
+  default: 'bg-transparent text-cream-dark border-charcoal-lighter',
+  amber: 'bg-transparent text-amber border-amber/40',
+  sage: 'bg-transparent text-sage border-sage/40',
+  wine: 'bg-transparent text-wine border-wine/40',
+  warning: 'bg-transparent text-error border-error/40',
 };
 
 export function Badge({

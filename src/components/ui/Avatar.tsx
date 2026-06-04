@@ -9,10 +9,10 @@ interface AvatarProps {
 }
 
 const genderColors: Record<Gender, string> = {
-  male: 'bg-[#4a6fa5]/30 border-[#4a6fa5]/50 text-[#8ab4f8]',
-  female: 'bg-[#a5547a]/30 border-[#a5547a]/50 text-[#f8a0c8]',
-  other: 'bg-sage/30 border-sage/50 text-sage-light',
-  unknown: 'bg-charcoal-lighter border-charcoal-lighter text-cream/60',
+  male: 'bg-charcoal border-amber/30 text-amber',
+  female: 'bg-charcoal border-wine/40 text-wine',
+  other: 'bg-charcoal border-sage/40 text-sage',
+  unknown: 'bg-charcoal border-charcoal-lighter text-cream-dark',
 };
 
 const sizeClasses = {

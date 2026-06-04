@@ -29,7 +29,7 @@ export function LanguageSwitcher({ variant = 'icon' }: LanguageSwitcherProps) {
       {variant === 'pill' ? (
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream/5 border border-cream/10 text-cream/50 hover:text-cream/80 hover:border-cream/20 transition-all text-xs cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-transparent border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber/40 transition-colors text-xs cursor-pointer"
           title={strings.app.language}
         >
           <Globe size={12} />
@@ -39,7 +39,7 @@ export function LanguageSwitcher({ variant = 'icon' }: LanguageSwitcherProps) {
       ) : (
         <button
           onClick={() => setOpen(!open)}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-cream/50 hover:text-cream hover:bg-cream/5 transition-all cursor-pointer"
+          className="w-8 h-8 rounded-md flex items-center justify-center text-cream-dark hover:text-cream hover:bg-cream/5 transition-colors cursor-pointer"
           title={strings.app.language}
         >
           <Globe size={14} />
@@ -48,7 +48,7 @@ export function LanguageSwitcher({ variant = 'icon' }: LanguageSwitcherProps) {
 
       {open && (
         <div
-          className="absolute right-0 top-full mt-1 w-36 bg-charcoal-light border border-charcoal-lighter rounded-xl shadow-2xl py-1.5 animate-fade-in">
+          className="absolute end-0 top-full mt-1 w-36 bg-charcoal-light border border-charcoal-lighter rounded-lg shadow-md py-1.5 animate-fade-in">
           {(Object.keys(LOCALE_META) as Locale[]).map((l) => (
             <button
               key={l}
@@ -56,8 +56,8 @@ export function LanguageSwitcher({ variant = 'icon' }: LanguageSwitcherProps) {
                 setLocale(l);
                 setOpen(false);
               }}
-              className={`w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-cream/5 transition-colors cursor-pointer ${
-                locale === l ? 'text-amber' : 'text-cream/60'
+              className={`w-full px-3 py-2 text-start text-xs flex items-center gap-2 hover:bg-cream/5 transition-colors cursor-pointer ${
+                locale === l ? 'text-amber' : 'text-cream-dark'
               }`}
             >
               <span>{LOCALE_META[l].flag}</span>

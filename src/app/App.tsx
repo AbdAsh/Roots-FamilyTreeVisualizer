@@ -91,7 +91,7 @@ export default function App() {
 
   const saveStatusIcon =
     saveStatus === 'saving' ? (
-      <Loader2 size={10} className="animate-spin text-amber/60" />
+      <Loader2 size={10} className="animate-spin text-amber" />
     ) : saveStatus === 'saved' ? (
       <Check size={10} className="text-sage" />
     ) : saveStatus === 'error' ? (
@@ -110,16 +110,16 @@ export default function App() {
   return (
     <div className="h-dvh flex flex-col relative">
       {/* Header */}
-      <header className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-charcoal-lighter/50 bg-charcoal/80 backdrop-blur-sm z-40 relative">
-        <div className="flex items-center gap-3">
+      <header className="shrink-0 flex items-center justify-between px-6 py-3.5 border-b border-charcoal-lighter bg-charcoal z-40 relative">
+        <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <TreePine size={18} className="text-amber" />
-            <h1 className="font-display text-base font-semibold text-cream tracking-tight">
+            <h1 className="font-display text-lg font-medium text-cream tracking-tight">
               {tree?.name ?? strings.app.title}
             </h1>
           </div>
           {tree && (
-            <span className="text-[10px] text-cream/30 uppercase tracking-wider flex items-center gap-1">
+            <span className="text-[10px] text-cream-dark uppercase tracking-wider flex items-center gap-1">
               <Users size={10} />
               {tPlural(strings.app.memberCount, tree.members.length)}
             </span>
@@ -127,7 +127,7 @@ export default function App() {
 
           {/* Save status */}
           {saveStatusText && (
-            <span className="text-[10px] text-cream/30 flex items-center gap-1 animate-fade-in">
+            <span className="text-[10px] text-cream-dark flex items-center gap-1 animate-fade-in">
               {saveStatusIcon}
               {saveStatusText}
             </span>
@@ -140,7 +140,7 @@ export default function App() {
             <div className="relative">
               <Search
                 size={13}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-cream/30 pointer-events-none"
+                className="absolute start-2.5 top-1/2 -translate-y-1/2 text-cream-dark pointer-events-none"
               />
               <input
                 ref={searchInputRef}
@@ -148,12 +148,13 @@ export default function App() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={strings.app.searchPlaceholder}
-                className="h-8 w-40 pl-8 pr-7 rounded-lg bg-charcoal-light/80 border border-charcoal-lighter text-xs text-cream/80 placeholder:text-cream/25 focus:border-amber/40 focus:outline-none transition-all"
+                aria-label={strings.app.searchPlaceholder}
+                className="h-8 w-40 ps-8 pe-7 rounded-md bg-charcoal border border-charcoal-lighter text-xs text-cream placeholder:text-cream/55 focus:border-amber focus:outline-none transition-colors"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-cream/30 hover:text-cream/60 cursor-pointer"
+                  className="absolute end-2 top-1/2 -translate-y-1/2 text-cream-dark hover:text-cream cursor-pointer"
                 >
                   <X size={12} />
                 </button>
@@ -167,7 +168,7 @@ export default function App() {
               <button
                 onClick={undo}
                 disabled={!canUndo()}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-cream/50 hover:text-cream hover:bg-cream/5 disabled:opacity-20 disabled:cursor-not-allowed transition-all cursor-pointer"
+                className="w-8 h-8 rounded-md flex items-center justify-center text-cream-dark hover:text-cream hover:bg-cream/5 disabled:opacity-25 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 title={`${strings.history.undo} (⌘Z)`}
               >
                 <Undo2 size={14} />
@@ -175,7 +176,7 @@ export default function App() {
               <button
                 onClick={redo}
                 disabled={!canRedo()}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-cream/50 hover:text-cream hover:bg-cream/5 disabled:opacity-20 disabled:cursor-not-allowed transition-all cursor-pointer"
+                className="w-8 h-8 rounded-md flex items-center justify-center text-cream-dark hover:text-cream hover:bg-cream/5 disabled:opacity-25 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 title={`${strings.history.redo} (⌘⇧Z)`}
               >
                 <Redo2 size={14} />
@@ -198,7 +199,13 @@ export default function App() {
           >
             {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => setAboutOpen(true)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setAboutOpen(true)}
+            aria-label={strings.about.title}
+            title={strings.about.title}
+          >
             <Info size={14} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setShareOpen(true)}>
@@ -228,7 +235,7 @@ export default function App() {
       {/* Hint bar (bottom) */}
       {tree && tree.members.length === 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 animate-fade-in">
-          <div className="px-5 py-2.5 bg-charcoal-light/90 border border-charcoal-lighter rounded-full text-xs text-cream/50 backdrop-blur-sm">
+          <div className="px-5 py-2.5 bg-charcoal-light border border-charcoal-lighter rounded-full text-xs text-cream-dark shadow-sm">
             {strings.app.hintAddRelative}
           </div>
         </div>

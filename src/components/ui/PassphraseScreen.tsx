@@ -12,10 +12,10 @@ import { useI18n, t } from '@/lib/i18n';
 import { evaluateStrength, isAcceptable } from '@/lib/passphrase';
 
 const STRENGTH_COLORS: Record<string, string> = {
-  weak: 'bg-red-500',
+  weak: 'bg-error',
   fair: 'bg-amber',
   good: 'bg-sage',
-  strong: 'bg-emerald-500',
+  strong: 'bg-sage',
 };
 
 export function PassphraseScreen() {
@@ -96,9 +96,9 @@ export function PassphraseScreen() {
   const isThrottled = throttleSeconds > 0;
 
   return (
-    <div className="min-h-dvh flex items-center justify-center p-4 relative">
+    <div className="min-h-dvh flex items-center justify-center p-6 relative">
       {/* Language switcher + theme toggle — top right */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+      <div className="absolute top-5 end-5 z-20 flex items-center gap-2">
         <Button
           variant="ghost"
           size="sm"
@@ -111,35 +111,20 @@ export function PassphraseScreen() {
         <LanguageSwitcher variant="pill" />
       </div>
 
-      {/* Decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-32 w-64 h-64 rounded-full bg-amber/5 blur-3xl" />
-        <div className="absolute bottom-1/4 -right-32 w-64 h-64 rounded-full bg-sage/5 blur-3xl" />
-      </div>
-
       <motion.div
         key={shakeKey}
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className={`
-          relative z-10 w-full max-w-md
-          bg-charcoal-light/80 backdrop-blur-md
-          border border-charcoal-lighter/60
-          rounded-2xl shadow-2xl
-          p-8 sm:p-10
-          ${error ? 'animate-shake' : ''}
-        `}
+        className={`relative z-10 w-full max-w-sm ${error ? 'animate-shake' : ''}`}
       >
         {/* Logo / Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber/10 border border-amber/20 mb-4">
-            <TreePine size={28} className="text-amber" />
-          </div>
-          <h1 className="font-display text-2xl font-bold text-cream tracking-tight">
+        <div className="text-center mb-10">
+          <TreePine size={32} className="text-amber mx-auto mb-5" />
+          <h1 className="font-display text-4xl font-medium text-cream tracking-tight">
             {strings.app.title}
           </h1>
-          <p className="mt-1 text-sm text-cream/40 font-body">
+          <p className="mt-2 text-sm text-cream-dark font-body">
             {isNewTree ? strings.auth.plantTree : strings.auth.unlockTree}
           </p>
         </div>
@@ -178,7 +163,7 @@ export function PassphraseScreen() {
             <button
               type="button"
               onClick={() => setShowPass(!showPass)}
-              className="absolute right-4 top-[34px] text-cream/30 hover:text-cream/60 transition-colors cursor-pointer"
+              className="absolute end-4 top-[36px] text-cream-dark hover:text-cream transition-colors cursor-pointer"
               tabIndex={-1}
             >
               {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -188,7 +173,7 @@ export function PassphraseScreen() {
           {/* Strength meter (new tree only) */}
           {isNewTree && passphrase.length > 0 && (
             <div className="flex items-center gap-2 -mt-2">
-              <div className="flex-1 h-1 rounded-full bg-charcoal-lighter/40 overflow-hidden">
+              <div className="flex-1 h-1 rounded-full bg-charcoal-lighter overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-300 ${STRENGTH_COLORS[strength.level]}`}
                   style={{ width: `${strength.score}%` }}
@@ -197,12 +182,10 @@ export function PassphraseScreen() {
               <span
                 className={`text-[10px] font-medium ${
                   strength.level === 'weak'
-                    ? 'text-red-400'
+                    ? 'text-error'
                     : strength.level === 'fair'
                       ? 'text-amber'
-                      : strength.level === 'good'
-                        ? 'text-sage'
-                        : 'text-emerald-400'
+                      : 'text-cream-dark'
                 }`}
               >
                 {strengthLabel}
@@ -212,7 +195,7 @@ export function PassphraseScreen() {
 
           {/* Throttle warning (unlock mode) */}
           {!isNewTree && isThrottled && (
-            <p className="text-[11px] text-red-400/80 animate-fade-in -mt-2">
+            <p className="text-[11px] text-error animate-fade-in -mt-2">
               {t(strings.auth.throttled, {
                 seconds: String(throttleSeconds),
               })}
@@ -221,7 +204,7 @@ export function PassphraseScreen() {
 
           {/* Hint for new tree */}
           {isNewTree && (
-            <p className="text-[11px] text-cream/30 leading-relaxed">
+            <p className="text-[11px] text-cream-dark leading-relaxed">
               {strings.auth.passphraseHint}
             </p>
           )}
@@ -239,7 +222,7 @@ export function PassphraseScreen() {
             size="lg"
           >
             {isLoading ? (
-              <span className="inline-block w-4 h-4 border-2 border-charcoal border-t-transparent rounded-full animate-spin" />
+              <span className="inline-block w-4 h-4 border-2 border-charcoal-light border-t-transparent rounded-full animate-spin" />
             ) : isNewTree ? (
               <>
                 <Plus size={18} /> {strings.auth.createTree}
@@ -257,7 +240,7 @@ export function PassphraseScreen() {
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(true)}
-                className="inline-flex items-center gap-1.5 text-[11px] text-cream/25 hover:text-cream/50 transition-colors cursor-pointer group"
+                className="inline-flex items-center gap-1.5 text-[11px] text-cream-dark hover:text-cream transition-colors cursor-pointer group"
               >
                 <RotateCcw
                   size={11}
@@ -270,18 +253,18 @@ export function PassphraseScreen() {
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-[10px] text-cream/20 uppercase tracking-widest">
+        <p className="mt-8 text-center text-[10px] text-cream-dark uppercase tracking-widest">
           {strings.auth.footer}
         </p>
       </motion.div>
 
       {/* Developer credit */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
         <a
           href="https://abdash.net"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[10px] text-cream/15 hover:text-cream/30 transition-colors"
+          className="text-[10px] text-cream-dark hover:text-cream transition-colors"
         >
           Built by Abdulrahman Mahmutoglu
         </a>

@@ -43,7 +43,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-charcoal/80"
             onClick={onClose}
           />
 
@@ -55,14 +55,16 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
           >
-            <div className="pointer-events-auto w-full max-w-md bg-charcoal-light border border-charcoal-lighter rounded-2xl shadow-2xl">
+            <div className="pointer-events-auto w-full max-w-md bg-charcoal-light border border-charcoal-lighter rounded-lg shadow-md">
               {/* Header */}
               {title && (
                 <div className="flex items-center justify-between px-6 py-4 border-b border-charcoal-lighter">
-                  <h2 className="font-display text-lg text-cream">{title}</h2>
+                  <h2 className="font-display text-xl font-medium text-cream tracking-tight">
+                    {title}
+                  </h2>
                   <button
                     onClick={onClose}
-                    className="p-1.5 rounded-md text-cream/40 hover:text-cream hover:bg-cream/5 transition-colors cursor-pointer"
+                    className="p-1.5 -me-1.5 rounded-md text-cream-dark hover:text-cream hover:bg-cream/5 transition-colors cursor-pointer"
                   >
                     <X size={18} />
                   </button>
