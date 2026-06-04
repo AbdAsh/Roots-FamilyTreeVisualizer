@@ -93,7 +93,7 @@ export function PassphraseScreen() {
   const isThrottled = throttleSeconds > 0;
 
   return (
-    <div className="noise-bg min-h-dvh flex items-center justify-center p-4 relative">
+    <div className="min-h-dvh flex items-center justify-center p-4 relative">
       {/* Language switcher — top right */}
       <div className="absolute top-4 right-4 z-20">
         <LanguageSwitcher variant="pill" />

@@ -1,31 +1,47 @@
 @import "tailwindcss";
 
-/* ===== Heritage Modern Theme ===== */
+/* ===== Editorial Paper — light is the default theme ===== */
 @theme {
-  --color-charcoal: #1a1a1a;
-  --color-charcoal-light: #2a2a2a;
-  --color-charcoal-lighter: #3a3a3a;
-  --color-amber: #d4a574;
-  --color-amber-light: #e4be94;
-  --color-amber-dark: #b8864f;
-  --color-cream: #f5f0e8;
-  --color-cream-dark: #e8e0d0;
-  --color-sage: #8fa68a;
-  --color-sage-light: #a8bda4;
-  --color-sage-dark: #6d8768;
-  --color-rust: #c17c5a;
-  --color-wine: #8b4557;
-  --color-gold: #c9a84c;
-  --color-error: #d45454;
-  --color-error-light: #f5d0d0;
+  /* Surfaces (warm paper) */
+  --color-charcoal: oklch(0.972 0.012 85);        /* page canvas */
+  --color-charcoal-light: oklch(0.992 0.008 85);  /* raised surface: modal, header */
+  --color-charcoal-lighter: oklch(0.885 0.010 80);/* hairline / border / input bg */
 
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
+  /* Ink (text) */
+  --color-cream: oklch(0.28 0.020 60);            /* primary ink */
+  --color-cream-dark: oklch(0.42 0.018 60);       /* secondary ink */
+
+  /* Accent — forest / olive (used sparingly) */
+  --color-amber: oklch(0.48 0.07 145);
+  --color-amber-light: oklch(0.55 0.08 145);
+  --color-amber-dark: oklch(0.42 0.07 145);
+
+  /* Semantic */
+  --color-sage: oklch(0.55 0.08 150);
+  --color-sage-light: oklch(0.62 0.08 150);
+  --color-sage-dark: oklch(0.46 0.08 150);
+  --color-rust: oklch(0.55 0.10 45);
+  --color-wine: oklch(0.48 0.10 18);
+  --color-gold: oklch(0.62 0.09 80);
+  --color-error: oklch(0.55 0.15 25);
+  --color-error-light: oklch(0.92 0.05 25);
+
+  /* Type */
+  --font-display: "Spectral", Georgia, serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+
+  /* Tree canvas vars (consumed in B) */
+  --tree-text: oklch(0.30 0.02 60);
+  --tree-text-dim: oklch(0.46 0.018 60);
+  --tree-text-faint: oklch(0.62 0.015 60);
+  --tree-ring: oklch(0.48 0.07 145);
+  --tree-ring-search: oklch(0.55 0.08 145);
+  --tree-link: oklch(0.55 0.012 60);       /* ink-toned link */
+  --tree-link-ref: oklch(0.68 0.010 60);   /* reference link (lighter) */
+  --tree-surface: oklch(0.992 0.008 85);   /* node card bg */
 }
 
 /* ===== Base Styles ===== */
-/* Tailwind v4 includes its own preflight reset via @import "tailwindcss",
-   so we place overrides in @layer base to keep correct cascade priority. */
 @layer base {
   html {
     font-family: var(--font-body);
@@ -34,28 +50,30 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  body { min-height: 100dvh; overflow: hidden; }
+  #root { min-height: 100dvh; }
 
-  body {
-    min-height: 100dvh;
-    overflow: hidden;
+  /* ===== Dark theme overrides ===== */
+  [data-theme="dark"] {
+    --color-charcoal: oklch(0.20 0.012 70);
+    --color-charcoal-light: oklch(0.25 0.012 70);
+    --color-charcoal-lighter: oklch(0.34 0.012 70);
+    --color-cream: oklch(0.93 0.012 85);
+    --color-cream-dark: oklch(0.80 0.012 85);
+    --color-amber: oklch(0.66 0.09 145);
+    --color-amber-light: oklch(0.74 0.09 145);
+    --color-amber-dark: oklch(0.58 0.09 145);
+    --color-error: oklch(0.68 0.15 25);
+
+    --tree-text: oklch(0.90 0.012 85);
+    --tree-text-dim: oklch(0.70 0.012 85);
+    --tree-text-faint: oklch(0.52 0.012 85);
+    --tree-ring: oklch(0.66 0.09 145);
+    --tree-ring-search: oklch(0.74 0.09 145);
+    --tree-link: oklch(0.62 0.012 85);
+    --tree-link-ref: oklch(0.46 0.012 85);
+    --tree-surface: oklch(0.25 0.012 70);
   }
-
-  #root {
-    min-height: 100dvh;
-  }
-}
-
-/* ===== Noise Texture Overlay ===== */
-.noise-bg::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.035;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
 }
 
 /* ===== Scrollbar ===== */
@@ -93,28 +111,9 @@
 }
 
 /* ===== Tree Link Styles ===== */
-.tree-link-parent-child {
-  stroke: var(--color-amber);
-  stroke-width: 1.5;
-  fill: none;
-  opacity: 0.6;
-}
-
-.tree-link-spouse {
-  stroke: var(--color-wine);
-  stroke-width: 1.5;
-  stroke-dasharray: 6 4;
-  fill: none;
-  opacity: 0.6;
-}
-
-.tree-link-sibling {
-  stroke: var(--color-sage);
-  stroke-width: 1;
-  stroke-dasharray: 2 3;
-  fill: none;
-  opacity: 0.5;
-}
+.tree-link-parent-child { stroke: var(--tree-link); stroke-width: 1.4; fill: none; opacity: .8; }
+.tree-link-spouse { stroke: var(--tree-link); stroke-width: 1.4; stroke-dasharray: 5 4; fill: none; opacity: .7; }
+.tree-link-sibling { stroke: var(--tree-link); stroke-width: 1; stroke-dasharray: 1.5 3; fill: none; opacity: .6; }
 
 /* ===== Animations ===== */
 @keyframes shake {
@@ -134,13 +133,4 @@
 
 .animate-fade-in {
   animation: fade-in 0.4s ease-out;
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0); }
-  50% { box-shadow: 0 0 20px 4px rgba(212, 165, 116, 0.15); }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
 }

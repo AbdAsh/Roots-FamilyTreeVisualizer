@@ -103,7 +103,7 @@ export default function App() {
           : null;
 
   return (
-    <div className="noise-bg h-dvh flex flex-col relative">
+    <div className="h-dvh flex flex-col relative">
       {/* Header */}
       <header className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-charcoal-lighter/50 bg-charcoal/80 backdrop-blur-sm z-40 relative">
         <div className="flex items-center gap-3">
