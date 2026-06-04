@@ -29,10 +29,14 @@ interface TreeState {
   tree: FamilyTree | null;
   /** ID of the currently selected member in the tree view. */
   selectedMemberId: string | null;
-  /** Whether the edit panel is open. */
+  // TODO(B8): remove after consumers migrate to detailsForId
+  /** @deprecated Use `detailsForId` instead. Whether the edit panel is open. */
   isEditing: boolean;
-  /** Member ID for which the "add relative" modal is open, or `null`. */
+  // TODO(B8): remove after consumers migrate to detailsForId
+  /** @deprecated Use `detailsForId` instead. Member ID for which the "add relative" modal is open, or `null`. */
   addingForMemberId: string | null;
+  /** ID of the member whose details modal is open, or `null`. Part of the new selection model (B task). */
+  detailsForId: string | null;
 
   /** @internal Undo stack — serialised JSON snapshots of past tree states. */
   _past: string[];
@@ -40,7 +44,7 @@ interface TreeState {
   _future: string[];
 
   // Tree lifecycle
-  /** Initialise a brand new tree with a single root member. */
+  /** Initialise a brand new empty tree (no members). The first `addMember` call will set the root. */
   initTree: (name: string) => FamilyTree;
   /** Replace the entire tree (used on load / import). Resets history. */
   setTree: (tree: FamilyTree) => void;
@@ -66,12 +70,16 @@ interface TreeState {
   removeRelationship: (id: string) => void;
 
   // Selection
-  /** Select a member (or deselect by passing `null`). Opens edit panel. */
+  /** Select a member (or deselect by passing `null`). Sets selectedMemberId only — does not open any panel. */
   selectMember: (id: string | null) => void;
-  /** Toggle the edit panel open/closed. */
+  // TODO(B8): remove after consumers migrate to detailsForId
+  /** @deprecated Use `openDetails` instead. Toggle the edit panel open/closed. */
   setEditing: (editing: boolean) => void;
-  /** Open/close the "add relative" modal for a given member. */
+  // TODO(B8): remove after consumers migrate to detailsForId
+  /** @deprecated Use `openDetails` instead. Open/close the "add relative" modal for a given member. */
   setAddingFor: (memberId: string | null) => void;
+  /** Open or close the details modal for the given member ID (pass `null` to close). */
+  openDetails: (id: string | null) => void;
 
   /**
    * Convenience: add a relative (creates member + relationship in one step).
@@ -81,6 +89,17 @@ interface TreeState {
     relativeTo: string,
     relType: 'parent' | 'child' | 'spouse' | 'sibling',
     member: Omit<FamilyMember, 'id'>,
+  ) => FamilyMember;
+
+  /**
+   * Batch add: creates a member + primary relationship + resolved inferred relationships
+   * under a SINGLE snapshot (one undo step).
+   */
+  addRelativeBatch: (
+    relativeTo: string,
+    relType: 'parent' | 'child' | 'spouse' | 'sibling',
+    member: Omit<FamilyMember, 'id'>,
+    inferred: { type: RelationshipType; from: string; to: string }[],
   ) => FamilyMember;
 
   // Undo / Redo
@@ -133,36 +152,23 @@ function hasDuplicate(
 export const useTreeStore = create<TreeState>((set, get) => ({
   tree: null,
   selectedMemberId: null,
-  isEditing: false,
-  addingForMemberId: null,
+  isEditing: false,       // TODO(B8): remove after consumers migrate to detailsForId
+  addingForMemberId: null, // TODO(B8): remove after consumers migrate to detailsForId
+  detailsForId: null,
   _past: [],
   _future: [],
 
   initTree: (name: string) => {
-    const rootMember: FamilyMember = {
-      id: nanoid(10),
-      name: 'Root Person',
-      gender: 'unknown',
-      customFields: {},
-    };
-
     const tree: FamilyTree = {
       id: nanoid(10),
       name,
-      members: [rootMember],
+      members: [],
       relationships: [],
-      rootMemberId: rootMember.id,
+      rootMemberId: '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-
-    set({
-      tree,
-      selectedMemberId: rootMember.id,
-      isEditing: true,
-      _past: [],
-      _future: [],
-    });
+    set({ tree, selectedMemberId: null, detailsForId: null, _past: [], _future: [] });
     return tree;
   },
 
@@ -172,8 +178,9 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     set({
       tree: null,
       selectedMemberId: null,
-      isEditing: false,
-      addingForMemberId: null,
+      isEditing: false,       // TODO(B8): remove after consumers migrate to detailsForId
+      addingForMemberId: null, // TODO(B8): remove after consumers migrate to detailsForId
+      detailsForId: null,
       _past: [],
       _future: [],
     }),
@@ -182,11 +189,13 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     const member: FamilyMember = { ...memberData, id: nanoid(10) };
     set((state) => {
       if (!state.tree) return state;
+      const isFirst = state.tree.members.length === 0;
       return {
         ...pushSnapshot(state),
         tree: {
           ...state.tree,
           members: [...state.tree.members, member],
+          rootMemberId: isFirst ? member.id : state.tree.rootMemberId,
           updatedAt: new Date().toISOString(),
         },
       };
@@ -254,7 +263,8 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         },
         selectedMemberId:
           state.selectedMemberId === id ? null : state.selectedMemberId,
-        isEditing: state.selectedMemberId === id ? false : state.isEditing,
+        isEditing: state.selectedMemberId === id ? false : state.isEditing, // TODO(B8): remove after consumers migrate
+        detailsForId: state.detailsForId === id ? null : state.detailsForId,
       };
     });
   },
@@ -293,9 +303,13 @@ export const useTreeStore = create<TreeState>((set, get) => ({
 
   selectMember: (id) => set({ selectedMemberId: id }),
 
+  // TODO(B8): remove after consumers migrate to detailsForId
   setEditing: (editing) => set({ isEditing: editing, addingForMemberId: null }),
+  // TODO(B8): remove after consumers migrate to detailsForId
   setAddingFor: (memberId) =>
     set({ addingForMemberId: memberId, isEditing: false }),
+
+  openDetails: (id) => set({ detailsForId: id }),
 
   addRelative: (relativeTo, relType, memberData) => {
     const { addMember, addRelationship } = get();
@@ -316,6 +330,37 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         break;
     }
 
+    return member;
+  },
+
+  addRelativeBatch: (relativeTo, relType, memberData, inferred) => {
+    const member: FamilyMember = { ...memberData, id: nanoid(10) };
+    set((state) => {
+      if (!state.tree) return state;
+      const rels = [...state.tree.relationships];
+      const add = (type: RelationshipType, from: string, to: string) => {
+        if (!hasDuplicate(rels, type, from, to)) {
+          rels.push({ id: nanoid(10), type, from, to });
+        }
+      };
+      // primary relationship
+      if (relType === 'parent') add('parent-child', member.id, relativeTo);
+      else if (relType === 'child') add('parent-child', relativeTo, member.id);
+      else if (relType === 'spouse') add('spouse', relativeTo, member.id);
+      else add('sibling', relativeTo, member.id);
+      // inferred (already resolved to concrete {type, from, to} by the caller,
+      // substituting the new member id where needed)
+      for (const r of inferred) add(r.type, r.from, r.to);
+      return {
+        ...pushSnapshot(state),
+        tree: {
+          ...state.tree,
+          members: [...state.tree.members, member],
+          relationships: rels,
+          updatedAt: new Date().toISOString(),
+        },
+      };
+    });
     return member;
   },
 
