@@ -1,12 +1,13 @@
 import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Plus, TreePine, Eye, EyeOff, RotateCcw } from 'lucide-react';
+import { Lock, Plus, TreePine, Eye, EyeOff, RotateCcw, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAuthStore } from '@/hooks/useAuth';
 import { useTreeStore } from '@/hooks/useTree';
+import { useThemeStore } from '@/hooks/useTheme';
 import { useI18n, t } from '@/lib/i18n';
 import { evaluateStrength, isAcceptable } from '@/lib/passphrase';
 
@@ -30,6 +31,7 @@ export function PassphraseScreen() {
   } = useAuthStore();
   const { initTree, setTree } = useTreeStore();
   const { strings } = useI18n();
+  const { theme, toggle: toggleTheme } = useThemeStore();
 
   const [passphrase, setPassphrase] = useState('');
   const [familyName, setFamilyName] = useState('');
@@ -94,8 +96,16 @@ export function PassphraseScreen() {
 
   return (
     <div className="min-h-dvh flex items-center justify-center p-4 relative">
-      {/* Language switcher — top right */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* Language switcher + theme toggle — top right */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleTheme}
+          aria-label={strings.app.toggleTheme}
+        >
+          {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
+        </Button>
         <LanguageSwitcher variant="pill" />
       </div>
 

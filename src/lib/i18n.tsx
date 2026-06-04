@@ -61,6 +61,7 @@ export interface Translations {
     noMembers: string;
     hintAddRelative: string;
     language: string;
+    toggleTheme: string;
   };
   // Passphrase screen
   auth: {
@@ -231,6 +232,7 @@ const en: Translations = {
     hintAddRelative:
       'Click ＋ on a node to add relatives, or click the node to edit',
     language: 'Language',
+    toggleTheme: 'Toggle theme',
   },
   auth: {
     plantTree: 'Plant your family tree',
@@ -407,6 +409,7 @@ const ar: Translations = {
     hintAddRelative:
       'انقر على ＋ بجانب العقدة لإضافة أقارب، أو انقر على العقدة للتعديل',
     language: 'اللغة',
+    toggleTheme: 'تبديل السمة',
   },
   auth: {
     plantTree: 'ازرع شجرة عائلتك',
@@ -578,6 +581,7 @@ const tr: Translations = {
     hintAddRelative:
       'Akraba eklemek için düğümdeki ＋ işaretine, düzenlemek için düğüme tıklayın',
     language: 'Dil',
+    toggleTheme: 'Temayı değiştir',
   },
   auth: {
     plantTree: 'Aile ağacınızı oluşturun',

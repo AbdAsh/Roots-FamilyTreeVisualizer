@@ -12,6 +12,8 @@ import {
   AlertCircle,
   X,
   Info,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { PassphraseScreen } from '@/components/ui/PassphraseScreen';
 import { ShareModal } from '@/components/ui/ShareModal';
@@ -25,6 +27,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { Button } from '@/components/ui/Button';
 import { useTreeStore } from '@/hooks/useTree';
 import { useAuthStore } from '@/hooks/useAuth';
+import { useThemeStore } from '@/hooks/useTheme';
 import { useSave } from '@/hooks/useSave';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -43,6 +46,7 @@ export default function App() {
   const removeMember = useTreeStore((s) => s.removeMember);
 
   const { strings } = useI18n();
+  const { theme, toggle: toggleTheme } = useThemeStore();
   const [shareOpen, setShareOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -184,6 +188,14 @@ export default function App() {
           {/* Language selector */}
           <LanguageSwitcher />
 
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleTheme}
+            aria-label={strings.app.toggleTheme}
+          >
+            {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
+          </Button>
           <Button variant="ghost" size="sm" onClick={() => setAboutOpen(true)}>
             <Info size={14} />
           </Button>
