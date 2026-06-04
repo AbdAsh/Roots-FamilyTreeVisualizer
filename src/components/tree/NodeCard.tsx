@@ -276,35 +276,61 @@ export function NodeCard({
           groupLabel={strings.editor.gender}
         />
 
-        {/* Inferred-link toggle chips — only shown when there are suggestions */}
+        {/* Inferred-link opt-out checkboxes — only shown when there are suggestions.
+            Default CHECKED; unchecking opts OUT of the inferred link (e.g. a
+            half-sibling with a different parent, or a step-parent). The
+            enabledSuggestions Set + commit resolution stay unchanged. */}
         {suggestions.length > 0 && (
-          <div className="flex flex-col gap-1.5">
+          <div
+            className="flex flex-col gap-2"
+            role="group"
+            aria-label={strings.addRelative.additionalRels}
+          >
             <span className="text-[10px] font-body uppercase tracking-wider text-cream-dark">
               {strings.addRelative.additionalRels}
             </span>
-            <div className="flex flex-wrap gap-1.5" role="group" aria-label={strings.addRelative.additionalRels}>
+            <div className="flex flex-col gap-1">
               {suggestions.map((s) => {
                 const on = enabledSuggestions.has(s.key);
+                const label = t(strings.addRelative[s.labelType], {
+                  name: s.existingMemberName,
+                });
                 return (
                   <button
                     key={s.key}
                     type="button"
-                    role="switch"
+                    role="checkbox"
                     aria-checked={on}
-                    aria-label={t(strings.addRelative[s.labelType], { name: s.existingMemberName })}
                     onClick={() => toggleSuggestion(s.key)}
-                    className={`inline-flex items-center h-6 px-2 rounded-full border text-[10px] font-body
-                      transition-colors cursor-pointer
-                      ${on
-                        ? 'border-amber/60 bg-amber/10 text-amber'
-                        : 'border-charcoal-lighter bg-transparent text-cream-dark/50'
-                      }`}
+                    className="group flex items-center gap-2 min-h-[28px] py-1 -mx-1 px-1 rounded-md
+                      text-start transition-colors cursor-pointer
+                      hover:bg-cream/5 focus-visible:outline focus-visible:outline-2
+                      focus-visible:outline-amber focus-visible:outline-offset-1"
                   >
-                    {t(strings.addRelative[s.labelType], { name: s.existingMemberName })}
+                    <span
+                      aria-hidden="true"
+                      className={`grid place-items-center shrink-0 w-4 h-4 rounded-[4px] border transition-colors
+                        ${
+                          on
+                            ? 'border-amber bg-amber/15 text-amber'
+                            : 'border-charcoal-lighter bg-charcoal group-hover:border-cream-dark/50 text-transparent'
+                        }`}
+                    >
+                      <Check size={12} strokeWidth={3} />
+                    </span>
+                    <span
+                      className={`text-[11px] font-body leading-tight transition-colors
+                        ${on ? 'text-cream' : 'text-cream-dark'}`}
+                    >
+                      {label}
+                    </span>
                   </button>
                 );
               })}
             </div>
+            <p className="text-[10px] font-body leading-snug text-cream-dark/70">
+              {strings.addRelative.specialCaseHint}
+            </p>
           </div>
         )}
 

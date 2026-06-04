@@ -127,6 +127,7 @@ export interface Translations {
     sibling: string;
     name: string;
     additionalRels: string;
+    specialCaseHint: string;
     alsoChildOf: string; // "{name}"
     alsoParentOf: string; // "{name}"
     alsoSiblingOf: string; // "{name}"
@@ -288,7 +289,9 @@ const en: Translations = {
     spouseLabel: 'Spouse',
     sibling: 'Sibling',
     name: 'Name',
-    additionalRels: 'Additional relationships',
+    additionalRels: 'Additional links',
+    specialCaseHint:
+      "Linked automatically. Uncheck any that don't apply — for example, a half-sibling with a different parent, or a step-parent.",
     alsoChildOf: 'Also a child of {name}',
     alsoParentOf: 'Also parent of {name}',
     alsoSiblingOf: 'Also sibling of {name}',
@@ -449,7 +452,9 @@ const ar: Translations = {
     spouseLabel: 'زوج/ة',
     sibling: 'شقيق/ة',
     name: 'الاسم',
-    additionalRels: 'علاقات إضافية',
+    additionalRels: 'روابط إضافية',
+    specialCaseHint:
+      'تُربط تلقائياً. ألغِ تحديد ما لا ينطبق — مثلاً أخ غير شقيق من والد مختلف، أو زوج/ة أحد الوالدين.',
     alsoChildOf: 'أيضاً ابن/ة لـ {name}',
     alsoParentOf: 'أيضاً والد/ة لـ {name}',
     alsoSiblingOf: 'أيضاً شقيق/ة لـ {name}',
@@ -612,7 +617,9 @@ const tr: Translations = {
     spouseLabel: 'Eş',
     sibling: 'Kardeş',
     name: 'Ad',
-    additionalRels: 'Ek ilişkiler',
+    additionalRels: 'Ek bağlantılar',
+    specialCaseHint:
+      'Otomatik olarak bağlanır. Geçerli olmayanların işaretini kaldırın — örneğin farklı bir ebeveyni olan üvey kardeş ya da üvey anne/baba.',
     alsoChildOf: 'Ayrıca {name} çocuğu',
     alsoParentOf: 'Ayrıca {name} ebeveyni',
     alsoSiblingOf: 'Ayrıca {name} kardeşi',
