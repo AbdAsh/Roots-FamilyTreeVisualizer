@@ -22,9 +22,10 @@ import { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 
 import { useTreeStore } from '@/hooks/useTree';
 import { computeTieredLayout, type PositionedNode } from '@/lib/tree-utils';
-import { useI18n } from '@/lib/i18n';
+import { useI18n, t } from '@/lib/i18n';
 import { EdgeLayer, type EdgeBounds } from '@/components/tree/EdgeLayer';
 import { NodeCard } from '@/components/tree/NodeCard';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import type { RelType } from '@/components/tree/AddAffordances';
 
 /* ── Constants ── */
@@ -51,6 +52,7 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
   const tree = useTreeStore((s) => s.tree);
   const selectedMemberId = useTreeStore((s) => s.selectedMemberId);
   const selectMember = useTreeStore((s) => s.selectMember);
+  const removeMember = useTreeStore((s) => s.removeMember);
   const { strings } = useI18n();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -63,6 +65,9 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
 
   /** Local draft for the create flow. */
   const [draft, setDraft] = useState<Draft>(null);
+
+  /** Member pending quick-delete confirmation (drives the ConfirmModal). */
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const layoutData = useMemo(() => {
     if (!tree) return null;
@@ -310,6 +315,13 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
                 node={n}
                 searchQuery={searchQuery}
                 onSpawnRelative={(relType) => spawnRelative(n.id, relType)}
+                // Hide quick-delete when this is the only member — removeMember
+                // refuses to delete the last one (mirrors the keyboard guard).
+                onRequestDelete={
+                  tree.members.length > 1
+                    ? () => setDeletingId(n.id)
+                    : undefined
+                }
               />
 
               {/* New relative card spawned by this node's affordance */}
@@ -366,6 +378,26 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
           FIT
         </button>
       </div>
+
+      {/* Quick-delete confirm. Rendered here — inside the OUTER (non-transformed)
+          container, NOT inside `.tree-root` — so the fixed-position Modal is
+          positioned relative to the viewport rather than the CSS-transformed
+          ancestor. */}
+      <ConfirmModal
+        isOpen={deletingId !== null}
+        onClose={() => setDeletingId(null)}
+        onConfirm={() => {
+          if (deletingId) removeMember(deletingId);
+          setDeletingId(null);
+        }}
+        variant="danger"
+        title={strings.editor.removeConfirmTitle}
+        message={t(strings.editor.removeConfirmMessage, {
+          name:
+            tree.members.find((m) => m.id === deletingId)?.name ??
+            strings.editor.unknown,
+        })}
+      />
     </div>
   );
 }

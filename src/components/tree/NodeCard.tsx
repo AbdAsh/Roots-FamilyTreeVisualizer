@@ -21,7 +21,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Check, X } from 'lucide-react';
+import { Check, X, Trash2 } from 'lucide-react';
 
 import { getInferredRelationships, type PositionedNode } from '@/lib/tree-utils';
 import type { Gender } from '@/types/family';
@@ -47,6 +47,13 @@ export interface NodeCardProps {
   onCancel?: () => void;
   /** Asks FamilyTreeView to spawn a New card for the given relationship. */
   onSpawnRelative?: (relType: RelType) => void;
+  /**
+   * Asks FamilyTreeView to begin deleting this member. The confirm dialog is
+   * rendered by FamilyTreeView OUTSIDE the pan/zoom transform — a fixed-position
+   * modal mounted inside the transformed `.tree-root` would be positioned
+   * relative to that ancestor, not the viewport.
+   */
+  onRequestDelete?: () => void;
   /** Render the active/new card centered (mobile presents this way). */
   centered?: boolean;
 }
@@ -123,6 +130,7 @@ export function NodeCard({
   onCommitted,
   onCancel,
   onSpawnRelative,
+  onRequestDelete,
   centered = false,
 }: NodeCardProps) {
   const { strings } = useI18n();
@@ -376,8 +384,25 @@ export function NodeCard({
         className={`relative flex flex-col gap-3 w-60 p-4 rounded-xl bg-charcoal-light
           border border-amber/60 shadow-md ${centered ? 'mx-auto' : ''}`}
       >
-        {/* Header: avatar + inline name */}
-        <div className="flex items-center gap-3">
+        {/* Quick delete — top-end corner. Opens a confirm dialog owned by
+            FamilyTreeView (outside the pan/zoom transform). */}
+        {onRequestDelete && (
+          <button
+            type="button"
+            onClick={onRequestDelete}
+            aria-label={t(strings.editor.remove, { name: node.member.name })}
+            title={t(strings.editor.remove, { name: node.member.name })}
+            className="absolute top-2 end-2 z-10 grid place-items-center w-7 h-7 rounded-md
+              text-cream-dark hover:text-error hover:bg-error/10
+              focus-visible:outline focus-visible:outline-2 focus-visible:outline-error
+              focus-visible:outline-offset-1 transition-colors cursor-pointer"
+          >
+            <Trash2 size={15} aria-hidden="true" />
+          </button>
+        )}
+
+        {/* Header: avatar + inline name (pe-7 reserves room for the delete button) */}
+        <div className="flex items-center gap-3 pe-7">
           <span className="shrink-0">
             <Avatar
               name={node.member.name || '?'}
