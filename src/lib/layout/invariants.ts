@@ -24,7 +24,7 @@ export function assertNoOverlap(layout: TieredLayout): void {
   }
 }
 
-export function assertTierMonotonic(tree: FamilyTree, layout: TieredLayout): void {
+export function assertTierMonotonic(_tree: FamilyTree, layout: TieredLayout): void {
   const tierOf = new Map(layout.nodes.map((n) => [n.id, n.tier]));
   for (const l of layout.links) {
     if (l.type !== 'parent-child' || (l as { kind?: string }).kind === 'reference') continue;
