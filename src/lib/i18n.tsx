@@ -58,6 +58,7 @@ export interface Translations {
     lock: string;
     search: string;
     searchPlaceholder: string;
+    clearSearch: string;
     noMembers: string;
     hintAddRelative: string;
     language: string;
@@ -228,6 +229,7 @@ const en: Translations = {
     lock: 'Lock',
     search: 'Search',
     searchPlaceholder: 'Search members…',
+    clearSearch: 'Clear search',
     noMembers: 'No family members yet',
     hintAddRelative:
       'Click ＋ on a node to add relatives, or click the node to edit',
@@ -405,6 +407,7 @@ const ar: Translations = {
     lock: 'قفل',
     search: 'بحث',
     searchPlaceholder: 'البحث عن الأعضاء…',
+    clearSearch: 'مسح البحث',
     noMembers: 'لا يوجد أفراد في العائلة بعد',
     hintAddRelative:
       'انقر على ＋ بجانب العقدة لإضافة أقارب، أو انقر على العقدة للتعديل',
@@ -577,6 +580,7 @@ const tr: Translations = {
     lock: 'Kilitle',
     search: 'Ara',
     searchPlaceholder: 'Üye ara…',
+    clearSearch: 'Aramayı temizle',
     noMembers: 'Henüz aile üyesi yok',
     hintAddRelative:
       'Akraba eklemek için düğümdeki ＋ işaretine, düzenlemek için düğüme tıklayın',

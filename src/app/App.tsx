@@ -149,11 +149,13 @@ export default function App() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={strings.app.searchPlaceholder}
                 aria-label={strings.app.searchPlaceholder}
-                className="h-8 w-40 ps-8 pe-7 rounded-md bg-charcoal border border-charcoal-lighter text-xs text-cream placeholder:text-cream/55 focus:border-amber focus:outline-none transition-colors"
+                className="h-8 w-40 ps-8 pe-7 rounded-md bg-charcoal border border-charcoal-lighter text-xs text-cream placeholder:text-cream-dark focus:border-amber focus:outline-none transition-colors"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
+                  aria-label={strings.app.clearSearch}
+                  title={strings.app.clearSearch}
                   className="absolute end-2 top-1/2 -translate-y-1/2 text-cream-dark hover:text-cream cursor-pointer"
                 >
                   <X size={12} />
