@@ -75,7 +75,7 @@ function RelationRow({
       <button
         type="button"
         onClick={onNavigate}
-        className={`ps-3 pe-1 py-1.5 text-xs font-body truncate max-w-[160px] transition-colors cursor-pointer ${navClass[accent]}`}
+        className={`ps-3 pe-1 py-1.5 min-h-11 text-xs font-body truncate max-w-[160px] transition-colors cursor-pointer ${navClass[accent]}`}
       >
         {person.name || '—'}
       </button>
@@ -84,7 +84,7 @@ function RelationRow({
         onClick={onRemove}
         aria-label={`${removeTitle}: ${person.name}`}
         title={removeTitle}
-        className="grid place-items-center w-9 h-9 -ms-1 me-0.5 rounded-full text-cream-dark/50 hover:text-error focus-visible:text-error transition-colors cursor-pointer"
+        className="grid place-items-center w-11 h-11 -ms-1 me-0.5 rounded-full text-cream-dark/50 hover:text-error focus-visible:text-error transition-colors cursor-pointer"
       >
         <XIcon size={13} aria-hidden="true" />
       </button>
@@ -218,6 +218,8 @@ export function DetailsModal() {
         return;
       }
       if (e.key !== 'Tab') return;
+      // When a stacked ConfirmModal is open, let it own focus — do not trap.
+      if (removingRel || confirmDelete) return;
       const el = dialogRef.current;
       if (!el) return;
       const nodes = Array.from(el.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
