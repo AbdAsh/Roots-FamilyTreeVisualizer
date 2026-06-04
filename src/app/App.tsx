@@ -19,8 +19,7 @@ import { PassphraseScreen } from '@/components/ui/PassphraseScreen';
 import { ShareModal } from '@/components/ui/ShareModal';
 import { AboutModal } from '@/components/ui/AboutModal';
 import { FamilyTreeView } from '@/components/tree/FamilyTreeView';
-import { EditPanel } from '@/components/editor/EditPanel';
-import { AddModal } from '@/components/editor/AddModal';
+import { DetailsModal } from '@/components/editor/DetailsModal';
 import { Legend } from '@/components/ui/Legend';
 import { ExportImportBar } from '@/components/ui/ExportImportBar';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -224,11 +223,8 @@ export default function App() {
         {/* Family Tree View */}
         <FamilyTreeView searchQuery={searchQuery} />
 
-        {/* Edit Panel (slides in from right) */}
-        <EditPanel />
-
-        {/* Add Relative Panel */}
-        <AddModal />
+        {/* Centered details modal (full edit + relationships + delete) */}
+        <DetailsModal />
 
         {/* Legend */}
         {tree && <Legend />}
