@@ -153,7 +153,7 @@ export function ExportImportBar({
   }, [tree]);
 
   const btnCls =
-    'h-8 px-2.5 rounded-lg bg-charcoal-light/80 border border-charcoal-lighter text-cream/50 hover:text-cream hover:border-amber/30 flex items-center gap-1.5 text-[11px] font-medium transition-all cursor-pointer';
+    'h-8 px-2.5 rounded-lg bg-charcoal-light/80 border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber/30 flex items-center gap-1.5 text-[11px] font-medium transition-all cursor-pointer';
 
   const fileInput = (
     <input

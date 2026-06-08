@@ -12,6 +12,7 @@
  *
  * @module EdgeLayer
  */
+import { memo } from 'react';
 import type { PositionedLink } from '@/lib/tree-utils';
 
 /** A link may carry a `kind` discriminator once sub-project C lands; until then it is undefined. */
@@ -64,7 +65,7 @@ function linkCls(l: LinkWithKind): string {
       : 'tree-link-parent-child';
 }
 
-export function EdgeLayer({ links, bounds }: EdgeLayerProps) {
+function EdgeLayerImpl({ links, bounds }: EdgeLayerProps) {
   const { x0, y0, width, height } = bounds;
 
   return (
@@ -98,3 +99,6 @@ export function EdgeLayer({ links, bounds }: EdgeLayerProps) {
     </svg>
   );
 }
+
+/** Memoized: skips re-render when the (memoized) links array and bounds are unchanged. */
+export const EdgeLayer = memo(EdgeLayerImpl);

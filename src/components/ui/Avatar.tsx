@@ -46,6 +46,8 @@ export function Avatar({
       <img
         src={photoUrl}
         alt={name}
+        loading="lazy"
+        decoding="async"
         className={`${sizeClass} rounded-full object-cover border-2 ${colorClass.split(' ').find((c) => c.startsWith('border-'))} ${className}`}
       />
     );

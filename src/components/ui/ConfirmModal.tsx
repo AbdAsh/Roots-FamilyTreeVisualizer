@@ -35,7 +35,7 @@ export function ConfirmModal({
   const iconColor = variant === 'danger' ? 'text-error' : 'text-amber';
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} role="alertdialog" label={title}>
       <div className="flex flex-col items-center text-center gap-4 pt-2">
         {/* Icon */}
         <div className="w-11 h-11 rounded-full border border-charcoal-lighter flex items-center justify-center">

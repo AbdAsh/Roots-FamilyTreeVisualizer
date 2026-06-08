@@ -41,7 +41,7 @@ export function MenuRow({
       role="menuitem"
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center gap-3 w-full h-10 px-3 rounded-lg text-sm font-body text-start
+      className={`flex items-center gap-3 w-full h-11 px-3 rounded-lg text-sm font-body text-start
         transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed
         hover:bg-cream/5 focus-visible:bg-cream/5 focus-visible:outline-none
         ${active ? 'text-amber' : 'text-cream'}`}

@@ -174,6 +174,24 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
     [pushOffsets, pushProgress],
   );
 
+  /* Links shifted by the same push offsets as their endpoint nodes, so edges
+     track their nodes during the slide-out/snap-back. Memoized so EdgeLayer
+     (memoized) skips re-render while idle — it only recomputes when the layout
+     or the push state actually changes, not on every unrelated re-render. */
+  const displacedLinks = useMemo(() => {
+    if (!layoutData) return [];
+    return layoutData.links.map((l) => {
+      const sdx = (pushOffsets.get(l.sourceId)?.dx ?? 0) * pushProgress;
+      const tdx = (pushOffsets.get(l.targetId)?.dx ?? 0) * pushProgress;
+      if (sdx === 0 && tdx === 0) return l;
+      return {
+        ...l,
+        source: { x: l.source.x + sdx, y: l.source.y },
+        target: { x: l.target.x + tdx, y: l.target.y },
+      };
+    });
+  }, [layoutData, pushOffsets, pushProgress]);
+
   /* ── Transform helpers ── */
   const applyTransform = useCallback(() => {
     const g = containerRef.current?.querySelector(
@@ -295,6 +313,8 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
       setDraft({ relativeTo, relType }),
     [],
   );
+  // Stable so the memoized NodeCard isn't invalidated every render.
+  const requestDelete = useCallback((id: string) => setDeletingId(id), []);
 
   /* ── Empty state (no members and no first-person draft) ── */
   if (!tree) {
@@ -358,19 +378,6 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
   const draftRelative =
     draft && typeof draft === 'object' ? draft : null;
 
-  // Links shifted by the same push offsets as their endpoint nodes, so edges
-  // track their nodes during the slide-out/snap-back animation.
-  const displacedLinks = layoutData.links.map((l) => {
-    const sdx = offsetX(l.sourceId);
-    const tdx = offsetX(l.targetId);
-    if (sdx === 0 && tdx === 0) return l;
-    return {
-      ...l,
-      source: { x: l.source.x + sdx, y: l.source.y },
-      target: { x: l.target.x + tdx, y: l.target.y },
-    };
-  });
-
   return (
     <div
       ref={containerRef}
@@ -406,14 +413,11 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
               <NodeCard
                 node={n}
                 searchQuery={searchQuery}
-                onSpawnRelative={(relType) => spawnRelative(n.id, relType)}
+                onSpawnRelative={spawnRelative}
+                onRequestDelete={requestDelete}
                 // Hide quick-delete when this is the only member — removeMember
                 // refuses to delete the last one (mirrors the keyboard guard).
-                onRequestDelete={
-                  tree.members.length > 1
-                    ? () => setDeletingId(n.id)
-                    : undefined
-                }
+                canDelete={tree.members.length > 1}
               />
 
               {/* New relative card spawned by this node's affordance */}
@@ -443,7 +447,7 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
             applyTransform();
           }}
           aria-label="Zoom in"
-          className="w-9 h-9 rounded-lg bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
+          className="w-9 h-9 touch-target rounded-lg bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
         >
           +
         </button>
@@ -457,7 +461,7 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
             applyTransform();
           }}
           aria-label="Zoom out"
-          className="w-9 h-9 rounded-lg bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
+          className="w-9 h-9 touch-target rounded-lg bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
         >
           −
         </button>
@@ -465,7 +469,7 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
           type="button"
           onClick={fitToView}
           aria-label="Fit to view"
-          className="w-9 h-9 rounded-lg bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber flex items-center justify-center text-[10px] font-medium transition-colors cursor-pointer"
+          className="w-9 h-9 touch-target rounded-lg bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber flex items-center justify-center text-[10px] font-medium transition-colors cursor-pointer"
         >
           FIT
         </button>

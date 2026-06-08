@@ -65,7 +65,7 @@ function RelationRow({
 }) {
   const navClass: Record<typeof accent, string> = {
     sage: 'text-sage hover:text-sage-light',
-    wine: 'text-wine hover:text-[#809d69]',
+    wine: 'text-wine hover:text-wine-light',
     amber: 'text-amber hover:text-amber-light',
     cream: 'text-cream hover:text-cream',
   };

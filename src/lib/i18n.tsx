@@ -63,6 +63,7 @@ export interface Translations {
     language: string;
     toggleTheme: string;
     menu: string;
+    close: string;
   };
   // Passphrase screen
   auth: {
@@ -224,6 +225,7 @@ const en: Translations = {
     language: 'Language',
     toggleTheme: 'Toggle theme',
     menu: 'Menu',
+    close: 'Close',
   },
   auth: {
     plantTree: 'Plant your family tree',
@@ -390,6 +392,7 @@ const ar: Translations = {
     language: 'اللغة',
     toggleTheme: 'تبديل السمة',
     menu: 'القائمة',
+    close: 'إغلاق',
   },
   auth: {
     plantTree: 'ازرع شجرة عائلتك',
@@ -554,6 +557,7 @@ const tr: Translations = {
     language: 'Dil',
     toggleTheme: 'Temayı değiştir',
     menu: 'Menü',
+    close: 'Kapat',
   },
   auth: {
     plantTree: 'Aile ağacınızı oluşturun',

@@ -19,7 +19,7 @@
  *
  * @module NodeCard
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Check, X, Trash2 } from 'lucide-react';
 
@@ -45,15 +45,21 @@ export interface NodeCardProps {
   onCommitted?: (id: string) => void;
   /** Called when a `new` card is cancelled, or when an affordance spawns a draft. */
   onCancel?: () => void;
-  /** Asks FamilyTreeView to spawn a New card for the given relationship. */
-  onSpawnRelative?: (relType: RelType) => void;
   /**
-   * Asks FamilyTreeView to begin deleting this member. The confirm dialog is
+   * Asks FamilyTreeView to spawn a New card for the given relationship. Takes the
+   * source member id so the callback can stay referentially stable across nodes
+   * (keeps the memoized NodeCard from re-rendering every push-animation frame).
+   */
+  onSpawnRelative?: (id: string, relType: RelType) => void;
+  /**
+   * Asks FamilyTreeView to begin deleting the given member. The confirm dialog is
    * rendered by FamilyTreeView OUTSIDE the pan/zoom transform — a fixed-position
    * modal mounted inside the transformed `.tree-root` would be positioned
-   * relative to that ancestor, not the viewport.
+   * relative to that ancestor, not the viewport. Takes the id for stable identity.
    */
-  onRequestDelete?: () => void;
+  onRequestDelete?: (id: string) => void;
+  /** Whether quick-delete is offered (false hides it — e.g. the last remaining member). */
+  canDelete?: boolean;
   /** Render the active/new card centered (mobile presents this way). */
   centered?: boolean;
 }
@@ -113,7 +119,7 @@ function GenderControl({
             aria-label={labels[g.value]}
             title={labels[g.value]}
             onClick={() => onChange(g.value)}
-            className={`min-w-[36px] h-9 px-2 text-sm font-body transition-colors cursor-pointer
+            className={`min-w-[36px] h-9 touch-target px-2 text-sm font-body transition-colors cursor-pointer
               ${i > 0 ? 'border-s border-charcoal-lighter' : ''}
               ${
                 active
@@ -130,7 +136,7 @@ function GenderControl({
 }
 
 /* ═══ Component ═══ */
-export function NodeCard({
+function NodeCardImpl({
   node,
   searchQuery = '',
   mode = 'existing',
@@ -140,6 +146,7 @@ export function NodeCard({
   onCancel,
   onSpawnRelative,
   onRequestDelete,
+  canDelete = false,
   centered = false,
 }: NodeCardProps) {
   const { strings } = useI18n();
@@ -282,7 +289,7 @@ export function NodeCard({
           placeholder={strings.addRelative.name}
           aria-label={strings.editor.fullName}
           className="w-full h-9 px-2.5 rounded-md bg-charcoal border border-charcoal-lighter
-            font-display text-base text-cream placeholder:text-cream-dark/60
+            font-display text-base text-cream placeholder:text-cream-dark
             focus:border-amber focus:outline-none transition-colors"
         />
 
@@ -319,7 +326,7 @@ export function NodeCard({
                     role="checkbox"
                     aria-checked={on}
                     onClick={() => toggleSuggestion(s.key)}
-                    className="group flex items-center gap-2 min-h-[28px] py-1 -mx-1 px-1 rounded-md
+                    className="group flex items-center gap-2 min-h-[28px] touch-target py-1 -mx-1 px-1 rounded-md
                       text-start transition-colors cursor-pointer
                       hover:bg-cream/5 focus-visible:outline focus-visible:outline-2
                       focus-visible:outline-amber focus-visible:outline-offset-1"
@@ -397,13 +404,13 @@ export function NodeCard({
       >
         {/* Quick delete — top-end corner. Opens a confirm dialog owned by
             FamilyTreeView (outside the pan/zoom transform). */}
-        {onRequestDelete && (
+        {onRequestDelete && canDelete && (
           <button
             type="button"
-            onClick={onRequestDelete}
+            onClick={() => onRequestDelete(node.id)}
             aria-label={t(strings.editor.remove, { name: node.member.name })}
             title={t(strings.editor.remove, { name: node.member.name })}
-            className="absolute top-2 end-2 z-10 grid place-items-center w-7 h-7 rounded-md
+            className="absolute top-2 end-2 z-10 grid place-items-center w-7 h-7 touch-target rounded-md
               text-cream-dark hover:text-error hover:bg-error/10
               focus-visible:outline focus-visible:outline-2 focus-visible:outline-error
               focus-visible:outline-offset-1 transition-colors cursor-pointer"
@@ -471,10 +478,10 @@ export function NodeCard({
         {onSpawnRelative && (
           <>
             <div className="hidden sm:block">
-              <AddAffordances onAdd={(t) => onSpawnRelative(t)} />
+              <AddAffordances onAdd={(rt) => onSpawnRelative(node.id, rt)} />
             </div>
             <div className="sm:hidden">
-              <AddAffordances inline onAdd={(t) => onSpawnRelative(t)} />
+              <AddAffordances inline onAdd={(rt) => onSpawnRelative(node.id, rt)} />
             </div>
           </>
         )}
@@ -522,3 +529,11 @@ export function NodeCard({
     </motion.button>
   );
 }
+
+/**
+ * Memoized so an open card's compact neighbours don't re-render on every frame
+ * of the push-aside animation (which only changes FamilyTreeView's local
+ * progress, not these nodes' props). Requires the callbacks passed in to be
+ * referentially stable — see `onSpawnRelative`/`onRequestDelete`.
+ */
+export const NodeCard = memo(NodeCardImpl);

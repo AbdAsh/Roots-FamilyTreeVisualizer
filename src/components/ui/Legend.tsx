@@ -34,7 +34,7 @@ export function Legend() {
       {/* Toggle button */}
       <button
         onClick={() => setOpen(!open)}
-        className="w-8 h-8 rounded-md bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber/40 flex items-center justify-center transition-colors cursor-pointer"
+        className="w-8 h-8 touch-target rounded-md bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber/40 flex items-center justify-center transition-colors cursor-pointer"
         title={strings.legend.title}
       >
         <Info size={14} />
