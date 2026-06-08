@@ -9,8 +9,8 @@ import { create } from 'zustand';
 
 export type Theme = 'light' | 'dark';
 const STORAGE_KEY = 'roots-theme';
-const META_LIGHT = '#f6f3ec';
-const META_DARK = '#211e1a';
+const META_LIGHT = '#e4f1e6';
+const META_DARK = '#041107';
 
 function readInitial(): Theme {
   if (typeof document !== 'undefined') {
@@ -21,9 +21,9 @@ function readInitial(): Theme {
     const s = localStorage.getItem(STORAGE_KEY);
     if (s === 'light' || s === 'dark') return s;
   } catch { /* ignore */ }
-  if (typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
-  return 'light';
+  // Dark forest green is the brand default; an explicit toggle (persisted
+  // above) is the only thing that opts into the light paper theme.
+  return 'dark';
 }
 
 /** Applies a theme after the initial bootstrap (mirrors the inline script in index.html). */

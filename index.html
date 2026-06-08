@@ -25,19 +25,18 @@
     <link rel="alternate" hreflang="x-default" href="https://roots.abdash.net" />
 
     <!-- Theme & Icons -->
-    <meta name="theme-color" content="#211e1a" />
+    <meta name="theme-color" content="#041107" />
     <script>
       (function () {
         try {
           var t = localStorage.getItem('roots-theme');
-          if (t !== 'light' && t !== 'dark') {
-            t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-          }
+          // Dark forest green is the default; only a persisted choice picks light.
+          if (t !== 'light' && t !== 'dark') t = 'dark';
           document.documentElement.setAttribute('data-theme', t);
           var m = document.querySelector('meta[name="theme-color"]');
-          if (m) m.setAttribute('content', t === 'dark' ? '#211e1a' : '#f6f3ec');
+          if (m) m.setAttribute('content', t === 'dark' ? '#041107' : '#e4f1e6');
         } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.setAttribute('data-theme', 'dark');
         }
       })();
     </script>

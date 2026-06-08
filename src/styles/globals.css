@@ -2,14 +2,14 @@
 
 /* ===== Editorial Paper — light is the default theme ===== */
 @theme {
-  /* Surfaces (warm paper) */
-  --color-charcoal: oklch(0.972 0.012 85);        /* page canvas */
-  --color-charcoal-light: oklch(0.992 0.008 85);  /* raised surface: modal, header */
-  --color-charcoal-lighter: oklch(0.885 0.010 80);/* hairline / border / input bg */
+  /* Surfaces — light, fresh green-tinted off-white */
+  --color-charcoal: oklch(0.945 0.020 150);       /* page canvas */
+  --color-charcoal-light: oklch(0.975 0.014 150); /* raised surface: modal, header */
+  --color-charcoal-lighter: oklch(0.56 0.045 150);/* hairline / border — fresh green */
 
-  /* Ink (text) */
-  --color-cream: oklch(0.28 0.020 60);            /* primary ink */
-  --color-cream-dark: oklch(0.42 0.018 60);       /* secondary ink */
+  /* Ink (text) — fresh forest green on the light green canvas */
+  --color-cream: oklch(0.37 0.060 150);           /* primary ink */
+  --color-cream-dark: oklch(0.52 0.055 150);      /* secondary ink */
 
   /* Accent — forest / olive (used sparingly) */
   --color-amber: oklch(0.48 0.07 145);
@@ -20,9 +20,9 @@
   --color-sage: oklch(0.55 0.08 150);        /* success / positive */
   --color-sage-light: oklch(0.62 0.08 150);
   --color-sage-dark: oklch(0.46 0.08 150);
-  --color-rust: oklch(0.55 0.10 45);         /* legacy relationship/legend tints */
-  --color-wine: oklch(0.48 0.10 18);         /* legacy relationship/legend tints */
-  --color-gold: oklch(0.62 0.09 80);         /* legacy relationship/legend tints */
+  --color-rust: oklch(0.50 0.07 135);        /* green (was warm; kept for legacy refs) */
+  --color-wine: oklch(0.55 0.08 132);        /* leaf green — female gender tint */
+  --color-gold: oklch(0.60 0.07 140);        /* green (was warm; kept for legacy refs) */
   --color-error: oklch(0.55 0.15 25);
   --color-error-light: oklch(0.92 0.05 25);
 
@@ -30,15 +30,15 @@
   --font-display: "Spectral", Georgia, serif;
   --font-body: "Hanken Grotesk", system-ui, sans-serif;
 
-  /* Tree canvas vars (consumed in B) */
-  --tree-text: oklch(0.30 0.02 60);
-  --tree-text-dim: oklch(0.46 0.018 60);
-  --tree-text-faint: oklch(0.62 0.015 60);
-  --tree-ring: oklch(0.48 0.07 145);
-  --tree-ring-search: oklch(0.55 0.08 145);
-  --tree-link: oklch(0.55 0.012 60);       /* ink-toned link */
-  --tree-link-ref: oklch(0.68 0.010 60);   /* reference link (lighter) */
-  --tree-surface: oklch(0.992 0.008 85);   /* node card bg */
+  /* Tree canvas vars (consumed in B) — fresh green ink on the light canvas */
+  --tree-text: oklch(0.37 0.060 150);
+  --tree-text-dim: oklch(0.52 0.050 150);
+  --tree-text-faint: oklch(0.66 0.035 150);
+  --tree-ring: oklch(0.52 0.09 145);
+  --tree-ring-search: oklch(0.58 0.10 145);
+  --tree-link: oklch(0.56 0.045 150);      /* green ink-toned link */
+  --tree-link-ref: oklch(0.66 0.035 150);  /* reference link (lighter green) */
+  --tree-surface: oklch(0.975 0.014 150);  /* node card bg */
 }
 
 /* ===== Base Styles ===== */
@@ -53,13 +53,14 @@
   body { min-height: 100dvh; overflow: hidden; }
   #root { min-height: 100dvh; }
 
-  /* ===== Dark theme overrides ===== */
+  /* ===== Dark theme overrides — dark forest green (the default theme) ===== */
   [data-theme="dark"] {
-    --color-charcoal: oklch(0.20 0.012 70);
-    --color-charcoal-light: oklch(0.25 0.012 70);
-    --color-charcoal-lighter: oklch(0.34 0.012 70);
-    --color-cream: oklch(0.93 0.012 85);
-    --color-cream-dark: oklch(0.80 0.012 85);
+    /* Surfaces: near-black forest green, hue 150 to echo the accent */
+    --color-charcoal: oklch(0.16 0.030 150);        /* page canvas — near black */
+    --color-charcoal-light: oklch(0.205 0.032 150); /* raised surface: modal, header, card */
+    --color-charcoal-lighter: oklch(0.30 0.030 150);/* hairline / border */
+    --color-cream: oklch(0.93 0.016 150);           /* primary text — green-tinted off-white */
+    --color-cream-dark: oklch(0.80 0.016 150);      /* secondary text */
     --color-amber: oklch(0.66 0.09 145);
     --color-amber-light: oklch(0.74 0.09 145);
     --color-amber-dark: oklch(0.58 0.09 145);
@@ -68,18 +69,18 @@
     --color-sage: oklch(0.62 0.08 150);
     --color-sage-light: oklch(0.70 0.08 150);
     --color-sage-dark: oklch(0.54 0.08 150);
-    --color-rust: oklch(0.64 0.10 45);
-    --color-wine: oklch(0.58 0.10 18);
-    --color-gold: oklch(0.70 0.09 80);
+    --color-rust: oklch(0.60 0.08 135);
+    --color-wine: oklch(0.66 0.08 132);
+    --color-gold: oklch(0.70 0.07 140);
 
-    --tree-text: oklch(0.90 0.012 85);
-    --tree-text-dim: oklch(0.70 0.012 85);
-    --tree-text-faint: oklch(0.52 0.012 85);
+    --tree-text: oklch(0.90 0.016 150);
+    --tree-text-dim: oklch(0.70 0.016 150);
+    --tree-text-faint: oklch(0.52 0.020 150);
     --tree-ring: oklch(0.66 0.09 145);
     --tree-ring-search: oklch(0.74 0.09 145);
-    --tree-link: oklch(0.62 0.012 85);
-    --tree-link-ref: oklch(0.52 0.012 85);
-    --tree-surface: oklch(0.25 0.012 70);
+    --tree-link: oklch(0.62 0.020 150);
+    --tree-link-ref: oklch(0.52 0.020 150);
+    --tree-surface: oklch(0.205 0.032 150);
   }
 }
 
