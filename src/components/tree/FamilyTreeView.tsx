@@ -19,9 +19,11 @@
  * @module FamilyTreeView
  */
 import { useEffect, useRef, useMemo, useCallback, useState } from 'react';
+import { useReducedMotion } from 'framer-motion';
 
 import { useTreeStore } from '@/hooks/useTree';
 import { computeTieredLayout, type PositionedNode } from '@/lib/tree-utils';
+import { displaceForActive } from '@/lib/layout/push';
 import { useI18n, t } from '@/lib/i18n';
 import { EdgeLayer, type EdgeBounds } from '@/components/tree/EdgeLayer';
 import { NodeCard } from '@/components/tree/NodeCard';
@@ -45,6 +47,63 @@ function emptyNode(id: string): PositionedNode {
     tier: 0,
     isRoot: false,
   };
+}
+
+/**
+ * Drives the "push aside on open" animation. Returns a `progress` that eases
+ * 0→1 when a node becomes active and 1→0 when it's cleared, plus the `anchorId`
+ * — the node whose neighbours are being displaced. The anchor is *held* through
+ * the close animation (after `activeId` is already null) so neighbours animate
+ * back to their resting positions instead of snapping.
+ *
+ * `prefers-reduced-motion` jumps straight to the target with no tween.
+ */
+function usePushAnimation(activeId: string | null, reduce: boolean) {
+  const [progress, setProgress] = useState(0);
+  const progressRef = useRef(0);
+  const anchorRef = useRef<string | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (activeId) anchorRef.current = activeId;
+    const target = activeId ? 1 : 0;
+
+    if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+
+    if (reduce) {
+      progressRef.current = target;
+      setProgress(target);
+      if (target === 0) anchorRef.current = null;
+      return;
+    }
+
+    const DURATION = 220;
+    const from = progressRef.current;
+    let startTs: number | null = null;
+    const step = (ts: number) => {
+      if (startTs == null) startTs = ts;
+      const t = Math.min(1, (ts - startTs) / DURATION);
+      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      const value = from + (target - from) * eased;
+      progressRef.current = value;
+      setProgress(value);
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(step);
+      } else {
+        progressRef.current = target;
+        setProgress(target);
+        if (target === 0) anchorRef.current = null;
+        rafRef.current = null;
+      }
+    };
+    rafRef.current = requestAnimationFrame(step);
+
+    return () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [activeId, reduce]);
+
+  return { progress, anchorId: anchorRef.current };
 }
 
 /* ═══ Component ═══ */
@@ -95,6 +154,25 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
     y1 += NODE_R + BOUNDS_PAD;
     return { x0, y0, width: x1 - x0, height: y1 - y0 };
   }, [layoutData]);
+
+  /* ── Push-aside: same-tier neighbours slide out while a card is open ──
+     The active card morphs much larger than its compact slot, so without this
+     it paints over its neighbours. We displace only the covered neighbours,
+     only while open, and animate `offset * progress`. Links read the same
+     offsets (below) so edges stay attached to nodes throughout. */
+  const reduceMotion = useReducedMotion();
+  const { progress: pushProgress, anchorId } = usePushAnimation(
+    selectedMemberId,
+    !!reduceMotion,
+  );
+  const pushOffsets = useMemo(
+    () => displaceForActive(layoutData?.nodes ?? [], anchorId),
+    [layoutData, anchorId],
+  );
+  const offsetX = useCallback(
+    (id: string) => (pushOffsets.get(id)?.dx ?? 0) * pushProgress,
+    [pushOffsets, pushProgress],
+  );
 
   /* ── Transform helpers ── */
   const applyTransform = useCallback(() => {
@@ -280,6 +358,19 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
   const draftRelative =
     draft && typeof draft === 'object' ? draft : null;
 
+  // Links shifted by the same push offsets as their endpoint nodes, so edges
+  // track their nodes during the slide-out/snap-back animation.
+  const displacedLinks = layoutData.links.map((l) => {
+    const sdx = offsetX(l.sourceId);
+    const tdx = offsetX(l.targetId);
+    if (sdx === 0 && tdx === 0) return l;
+    return {
+      ...l,
+      source: { x: l.source.x + sdx, y: l.source.y },
+      target: { x: l.target.x + tdx, y: l.target.y },
+    };
+  });
+
   return (
     <div
       ref={containerRef}
@@ -293,13 +384,14 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
     >
       <div className="tree-root absolute left-0 top-0 origin-top-left will-change-transform">
         {/* Links: SVG behind nodes */}
-        <EdgeLayer links={layoutData.links} bounds={bounds} />
+        <EdgeLayer links={displacedLinks} bounds={bounds} />
 
         {/* Nodes: HTML cards at layout coordinates */}
         {layoutData.nodes.map((n) => {
           const isActive = selectedMemberId === n.id;
           const showDraftHere =
             draftRelative && draftRelative.relativeTo === n.id;
+          const ox = offsetX(n.id);
           return (
             <div
               key={n.id}
@@ -307,7 +399,7 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
               style={{
                 left: n.x,
                 top: n.y,
-                transform: 'translate(-50%,-50%)',
+                transform: `translate(calc(-50% + ${ox}px), -50%)`,
                 zIndex: isActive || showDraftHere ? 30 : 1,
               }}
             >

@@ -75,6 +75,15 @@ const GENDERS: { value: Gender; symbol: string }[] = [
   { value: 'unknown', symbol: '?' },
 ];
 
+/**
+ * Bubble↔card morph timing. Matches the neighbour push-aside animation in
+ * FamilyTreeView (220ms, easeOutCubic) so the card expands from / collapses to
+ * its compact bubble in lockstep with the connected nodes sliding away and back.
+ * Applied via a shared `layoutId` (the node id) on both the compact button and
+ * the active card, so Framer morphs the box between the two states.
+ */
+const MORPH_TRANSITION = { duration: 0.22, ease: [0.33, 1, 0.68, 1] as const };
+
 /* ── Gender segmented control ── */
 function GenderControl({
   value,
@@ -377,6 +386,8 @@ export function NodeCard({
       <motion.div
         ref={containerRef}
         layout={!reduce}
+        layoutId={!reduce ? node.id : undefined}
+        transition={{ layout: MORPH_TRANSITION }}
         initial={false}
         role="group"
         aria-label={node.member.name}
@@ -475,6 +486,8 @@ export function NodeCard({
   return (
     <motion.button
       layout={!reduce}
+      layoutId={!reduce ? node.id : undefined}
+      transition={{ layout: MORPH_TRANSITION }}
       type="button"
       onClick={() => selectMember(node.id)}
       aria-label={node.member.name || strings.editor.unknown}
