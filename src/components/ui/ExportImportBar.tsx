@@ -3,11 +3,22 @@ import { Download, Upload, Image, FileJson } from 'lucide-react';
 import { useTreeStore } from '@/hooks/useTree';
 import { useI18n } from '@/lib/i18n';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { MenuRow } from '@/components/ui/Menu';
 import { FamilyTreeSchema } from '@/lib/validation';
 import { computeTieredLayout } from '@/lib/tree-utils';
 import { renderTreeSvg, type ExportTheme } from '@/lib/tree-export';
 
-export function ExportImportBar() {
+interface ExportImportBarProps {
+  /** `'bar'` = inline chip toolbar (desktop header); `'menu'` = full-width rows (mobile burger). */
+  variant?: 'bar' | 'menu';
+  /** Called after an export action so a containing menu can close itself. */
+  onAction?: () => void;
+}
+
+export function ExportImportBar({
+  variant = 'bar',
+  onAction,
+}: ExportImportBarProps = {}) {
   const tree = useTreeStore((s) => s.tree);
   const setTree = useTreeStore((s) => s.setTree);
   const { strings } = useI18n();
@@ -74,14 +85,14 @@ export function ExportImportBar() {
     const v = (name: string, fallback: string) =>
       r.getPropertyValue(name).trim() || fallback;
     return {
-      bg: v('--color-charcoal', '#18181b'),
-      ink: v('--color-cream', '#f5f0e8'),
-      inkDim: v('--color-cream-dark', '#c8b89a'),
-      surface: v('--tree-surface', '#2a2a2a'),
-      hairline: v('--color-charcoal-lighter', '#3a3a3a'),
-      accent: v('--color-amber', '#d4a574'),
-      link: v('--tree-link', '#d4a574'),
-      linkRef: v('--tree-link-ref', '#8fa68a'),
+      bg: v('--color-charcoal', '#041107'),
+      ink: v('--color-cream', '#e1ebe2'),
+      inkDim: v('--color-cream-dark', '#b7c1b8'),
+      surface: v('--tree-surface', '#0c1b0f'),
+      hairline: v('--color-charcoal-lighter', '#233226'),
+      accent: v('--color-amber', '#6fa170'),
+      link: v('--tree-link', '#7e8a80'),
+      linkRef: v('--tree-link-ref', '#616c63'),
       fontDisplay: v('--font-display', 'Georgia, serif').replace(/"/g, "'"),
       fontBody: v('--font-body', 'system-ui, sans-serif').replace(/"/g, "'"),
     };
@@ -144,16 +155,81 @@ export function ExportImportBar() {
   const btnCls =
     'h-8 px-2.5 rounded-lg bg-charcoal-light/80 border border-charcoal-lighter text-cream/50 hover:text-cream hover:border-amber/30 flex items-center gap-1.5 text-[11px] font-medium transition-all cursor-pointer';
 
+  const fileInput = (
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept=".json"
+      onChange={handleFileChange}
+      className="hidden"
+    />
+  );
+
+  const importConfirmModal = (
+    <ConfirmModal
+      isOpen={importConfirm}
+      onClose={() => {
+        setImportConfirm(false);
+        pendingImport.current = null;
+      }}
+      onConfirm={confirmImport}
+      title={strings.exportImport.importConfirmTitle}
+      message={strings.exportImport.importConfirmMessage}
+      variant="warning"
+    />
+  );
+
+  // Menu variant: full-width rows for the mobile burger. Import deliberately
+  // does NOT call onAction — the menu must stay mounted so the file picker and
+  // the import-confirm dialog survive until the user resolves them.
+  if (variant === 'menu') {
+    return (
+      <>
+        <MenuRow
+          icon={FileJson}
+          label={strings.exportImport.exportJson}
+          onClick={() => {
+            handleExportJson();
+            onAction?.();
+          }}
+        />
+        <MenuRow
+          icon={Upload}
+          label={strings.exportImport.importJson}
+          onClick={handleImportClick}
+        />
+        <MenuRow
+          icon={Image}
+          label={strings.exportImport.exportPng}
+          onClick={() => {
+            handleExportPng();
+            onAction?.();
+          }}
+        />
+        <MenuRow
+          icon={Download}
+          label={strings.exportImport.exportSvg}
+          onClick={() => {
+            handleExportSvg();
+            onAction?.();
+          }}
+        />
+        {fileInput}
+        {importConfirmModal}
+      </>
+    );
+  }
+
   return (
     <>
-      <div className="flex items-center gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         <button
           onClick={handleExportJson}
           className={btnCls}
           title={strings.exportImport.exportJson}
         >
           <FileJson size={13} />
-          <span className="hidden sm:inline">
+          <span>
             {strings.exportImport.exportJson}
           </span>
         </button>
@@ -163,7 +239,7 @@ export function ExportImportBar() {
           title={strings.exportImport.importJson}
         >
           <Upload size={13} />
-          <span className="hidden sm:inline">
+          <span>
             {strings.exportImport.importJson}
           </span>
         </button>
@@ -173,7 +249,7 @@ export function ExportImportBar() {
           title={strings.exportImport.exportPng}
         >
           <Image size={13} />
-          <span className="hidden sm:inline">PNG</span>
+          <span>PNG</span>
         </button>
         <button
           onClick={handleExportSvg}
@@ -181,28 +257,11 @@ export function ExportImportBar() {
           title={strings.exportImport.exportSvg}
         >
           <Download size={13} />
-          <span className="hidden sm:inline">SVG</span>
+          <span>SVG</span>
         </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          onChange={handleFileChange}
-          className="hidden"
-        />
+        {fileInput}
       </div>
-
-      <ConfirmModal
-        isOpen={importConfirm}
-        onClose={() => {
-          setImportConfirm(false);
-          pendingImport.current = null;
-        }}
-        onConfirm={confirmImport}
-        title={strings.exportImport.importConfirmTitle}
-        message={strings.exportImport.importConfirmMessage}
-        variant="warning"
-      />
+      {importConfirmModal}
     </>
   );
 }

@@ -62,6 +62,7 @@ export interface Translations {
     firstPersonPrompt: string;
     language: string;
     toggleTheme: string;
+    menu: string;
   };
   // Passphrase screen
   auth: {
@@ -222,6 +223,7 @@ const en: Translations = {
     firstPersonPrompt: 'Add the first person — usually you',
     language: 'Language',
     toggleTheme: 'Toggle theme',
+    menu: 'Menu',
   },
   auth: {
     plantTree: 'Plant your family tree',
@@ -387,6 +389,7 @@ const ar: Translations = {
     firstPersonPrompt: 'أضف أول شخص — غالباً أنت',
     language: 'اللغة',
     toggleTheme: 'تبديل السمة',
+    menu: 'القائمة',
   },
   auth: {
     plantTree: 'ازرع شجرة عائلتك',
@@ -550,6 +553,7 @@ const tr: Translations = {
     firstPersonPrompt: 'İlk kişiyi ekleyin — genellikle siz',
     language: 'Dil',
     toggleTheme: 'Temayı değiştir',
+    menu: 'Menü',
   },
   auth: {
     plantTree: 'Aile ağacınızı oluşturun',
