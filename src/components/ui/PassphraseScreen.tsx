@@ -1,7 +1,8 @@
 import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Plus, TreePine, Eye, EyeOff, RotateCcw, Sun, Moon } from 'lucide-react';
+import { Lock, Plus, Eye, EyeOff, RotateCcw, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { RootsMark } from '@/components/ui/RootsMark';
 import { Input } from '@/components/ui/Input';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -120,7 +121,7 @@ export function PassphraseScreen() {
       >
         {/* Logo / Header */}
         <div className="text-center mb-10">
-          <TreePine size={32} className="text-amber mx-auto mb-5" />
+          <RootsMark size={32} className="text-amber mx-auto mb-5" />
           <h1 className="font-display text-4xl font-medium text-cream tracking-tight">
             {strings.app.title}
           </h1>

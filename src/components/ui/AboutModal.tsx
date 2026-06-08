@@ -6,9 +6,9 @@
  * @module AboutModal
  */
 import { Modal } from '@/components/ui/Modal';
+import { RootsMark } from '@/components/ui/RootsMark';
 import { useI18n } from '@/lib/i18n';
 import {
-  TreePine,
   Link2,
   Lock,
   Share2,
@@ -62,7 +62,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
     <Modal isOpen={isOpen} onClose={onClose} title={about.title}>
       <div className="flex flex-col gap-5 max-h-[70vh] overflow-y-auto pr-1 -mr-1 custom-scrollbar">
         {/* What is Roots */}
-        <Section icon={<TreePine size={14} />} title={about.whatTitle}>
+        <Section icon={<RootsMark size={14} />} title={about.whatTitle}>
           <p>{about.whatBody}</p>
         </Section>
 

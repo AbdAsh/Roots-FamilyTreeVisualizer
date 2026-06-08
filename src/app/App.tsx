@@ -3,7 +3,6 @@ import {
   Share2,
   Lock,
   Users,
-  TreePine,
   Undo2,
   Redo2,
   Search,
@@ -27,6 +26,7 @@ import { ExportImportBar } from '@/components/ui/ExportImportBar';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { HintBar } from '@/components/ui/HintBar';
 import { Button } from '@/components/ui/Button';
+import { RootsMark } from '@/components/ui/RootsMark';
 import { useTreeStore } from '@/hooks/useTree';
 import { useAuthStore } from '@/hooks/useAuth';
 import { useThemeStore } from '@/hooks/useTheme';
@@ -138,7 +138,7 @@ export default function App() {
       <header className="shrink-0 flex items-center justify-between gap-3 px-3 sm:px-6 py-3 sm:py-3.5 border-b border-charcoal-lighter bg-charcoal z-40 relative">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <div className="flex items-center gap-2 min-w-0">
-            <TreePine size={18} className="text-amber shrink-0" />
+            <RootsMark size={18} className="text-amber shrink-0" />
             <h1 className="font-display text-base sm:text-lg font-medium text-cream tracking-tight truncate">
               {tree?.name ?? strings.app.title}
             </h1>

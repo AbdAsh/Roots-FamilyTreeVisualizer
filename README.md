@@ -98,7 +98,7 @@ The tree visualization uses a **union-aware layered layout** implemented in pure
 
 ## Design
 
-Roots uses an **editorial-paper aesthetic** — Spectral (serif) for headings, Hanken Grotesk for body text, and an OKLCH terracotta palette. A light/dark theme toggle is available in the header and persists across sessions via `localStorage`.
+Roots uses an **editorial-paper aesthetic** — Spectral (serif) for headings, Hanken Grotesk for body text, and a green-monochrome OKLCH palette with a dark forest-green default. A light/dark theme toggle is available in the header and persists across sessions via `localStorage`.
 
 ## Getting Started
 
