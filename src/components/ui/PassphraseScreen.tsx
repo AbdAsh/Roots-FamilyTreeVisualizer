@@ -122,9 +122,13 @@ export function PassphraseScreen() {
         {/* Logo / Header */}
         <div className="text-center mb-10">
           <RootsMark size={32} className="text-amber mx-auto mb-5" />
-          <h1 className="font-display text-4xl font-medium text-cream tracking-tight">
+          <h1 className="sr-only">{strings.app.seoH1}</h1>
+          <div
+            aria-hidden="true"
+            className="font-display text-4xl font-medium text-cream tracking-tight"
+          >
             {strings.app.title}
-          </h1>
+          </div>
           <p className="mt-2 text-sm text-cream-dark font-body">
             {isNewTree ? strings.auth.plantTree : strings.auth.unlockTree}
           </p>
@@ -263,7 +267,7 @@ export function PassphraseScreen() {
       </motion.div>
 
       {/* Developer credit */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 whitespace-nowrap">
         <a
           href="https://abdash.net"
           target="_blank"
@@ -271,6 +275,13 @@ export function PassphraseScreen() {
           className="text-[10px] text-cream-dark hover:text-cream transition-colors"
         >
           Built by Abdulrahman Mahmutoglu
+        </a>
+        <span className="text-[10px] text-cream-dark/50" aria-hidden="true">·</span>
+        <a
+          href="/privacy.html"
+          className="text-[10px] text-cream-dark hover:text-cream transition-colors"
+        >
+          Privacy
         </a>
       </div>
 

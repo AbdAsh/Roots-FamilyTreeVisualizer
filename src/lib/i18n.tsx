@@ -53,6 +53,7 @@ export interface Translations {
   // App chrome
   app: {
     title: string;
+    seoH1: string; // keyword-bearing, screen-reader-only H1 for the landing page
     memberCount: string; // "{count} member" / "{count} members"
     share: string;
     lock: string;
@@ -215,6 +216,7 @@ export interface Translations {
 const en: Translations = {
   app: {
     title: 'Roots',
+    seoH1: 'Roots — Free Family Tree Maker',
     memberCount: '{count} member||{count} members',
     share: 'Share',
     lock: 'Lock',
@@ -382,6 +384,7 @@ const en: Translations = {
 const ar: Translations = {
   app: {
     title: 'جذور',
+    seoH1: 'جذور — أداة مجانية لرسم شجرة العائلة',
     memberCount: '{count} عضو||{count} أعضاء',
     share: 'مشاركة',
     lock: 'قفل',
@@ -547,6 +550,7 @@ const ar: Translations = {
 const tr: Translations = {
   app: {
     title: 'Kökler',
+    seoH1: 'Kökler — Ücretsiz Soy Ağacı Oluşturucu',
     memberCount: '{count} üye||{count} üye',
     share: 'Paylaş',
     lock: 'Kilitle',
