@@ -35,6 +35,10 @@ export function useKeyboardShortcuts({
         target.isContentEditable;
 
       const mod = e.metaKey || e.ctrlKey;
+      // Normalize letter keys: with Shift held, KeyboardEvent.key is uppercase
+      // (e.g. 'Z'), so compare case-insensitively or the Shift-based shortcuts
+      // (⌘⇧Z redo) never match.
+      const key = e.key.toLowerCase();
 
       // Escape — close details modal → deselect node → blur search
       if (e.key === 'Escape') {
@@ -59,21 +63,21 @@ export function useKeyboardShortcuts({
       if (isInput) return;
 
       // Ctrl+Z — undo
-      if (mod && !e.shiftKey && e.key === 'z') {
+      if (mod && !e.shiftKey && key === 'z') {
         e.preventDefault();
         undo();
         return;
       }
 
       // Ctrl+Shift+Z or Ctrl+Y — redo
-      if ((mod && e.shiftKey && e.key === 'z') || (mod && e.key === 'y')) {
+      if ((mod && e.shiftKey && key === 'z') || (mod && key === 'y')) {
         e.preventDefault();
         redo();
         return;
       }
 
       // Ctrl+K or / — focus search
-      if ((mod && e.key === 'k') || e.key === '/') {
+      if ((mod && key === 'k') || e.key === '/') {
         e.preventDefault();
         searchInputRef.current?.focus();
         return;

@@ -44,6 +44,13 @@ function linkD(l: PositionedLink): string {
   return `M${s.x},${s.y} L${t.x},${t.y}`;
 }
 
+/**
+ * Render the tree to a standalone SVG string. Colours are inlined from the live
+ * theme (exact match). Fonts are referenced by family name only — the brand web
+ * fonts (Spectral/Hanken) are NOT embedded, so when this SVG is rasterised via
+ * `<img>` for PNG export, or opened as a standalone file, text falls back to the
+ * generic serif/sans family rather than the on-screen typeface.
+ */
 export function renderTreeSvg(
   layout: TieredLayout,
   theme: ExportTheme,

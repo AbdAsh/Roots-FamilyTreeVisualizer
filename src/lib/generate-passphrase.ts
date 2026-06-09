@@ -18,7 +18,7 @@
  * Short, common, family-friendly words (easy to spell and say). Kept to distinct,
  * unambiguous words so a spoken/written passphrase round-trips cleanly.
  */
-const WORDS = [
+export const WORDS = [
   'amber', 'anchor', 'apple', 'arbor', 'arrow', 'aspen', 'autumn', 'basil',
   'beacon', 'birch', 'bloom', 'bramble', 'branch', 'breeze', 'bridge', 'brook',
   'canyon', 'cedar', 'cherry', 'clover', 'cobalt', 'comet', 'copper', 'coral',
@@ -34,7 +34,7 @@ const WORDS = [
   'storm', 'summit', 'sunset', 'tamarind', 'thicket', 'thistle', 'thunder', 'timber',
   'topaz', 'trellis', 'tulip', 'umber', 'valley', 'velvet', 'violet', 'walnut',
   'willow', 'window', 'winter', 'wisteria', 'wren', 'zephyr', 'almond', 'badger',
-  'bayou', 'blossom', 'bluebell', 'brook', 'buckeye', 'cactus', 'cavern', 'cinder',
+  'bayou', 'blossom', 'bluebell', 'bracken', 'buckeye', 'cactus', 'cavern', 'cinder',
   'citron', 'cliff', 'cloud', 'cove', 'cricket', 'dune', 'eagle', 'fjord',
   'flint', 'galaxy', 'glacier', 'grove', 'lark', 'marsh', 'mesa', 'moose',
   'orchid', 'petal', 'pueblo', 'rapids', 'reed', 'sienna', 'stone', 'tundra',

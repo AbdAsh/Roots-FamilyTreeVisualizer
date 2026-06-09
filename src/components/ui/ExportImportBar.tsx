@@ -79,7 +79,9 @@ export function ExportImportBar({
 
   /* ── Theme reader ── */
   // Reads current CSS custom properties into an ExportTheme so the exported
-  // SVG matches the live light/dark theme exactly.
+  // SVG matches the live light/dark theme COLOURS exactly. (The brand web fonts
+  // Spectral/Hanken can't be embedded, so exported text falls back to the
+  // generic serif/sans family — see renderTreeSvg.)
   function readExportTheme(): ExportTheme {
     const r = getComputedStyle(document.documentElement);
     const v = (name: string, fallback: string) =>

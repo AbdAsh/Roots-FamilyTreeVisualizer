@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generatePassphrase } from './generate-passphrase';
+import { generatePassphrase, WORDS } from './generate-passphrase';
 
 describe('generatePassphrase', () => {
   it('produces a reasonably long passphrase (>= 12 chars)', () => {
@@ -29,5 +29,9 @@ describe('generatePassphrase', () => {
   it('is unpredictable — 30 calls yield mostly distinct values', () => {
     const set = new Set(Array.from({ length: 30 }, () => generatePassphrase()));
     expect(set.size).toBeGreaterThan(25);
+  });
+
+  it('has a fully distinct wordlist (no duplicates skewing entropy)', () => {
+    expect(new Set(WORDS).size).toBe(WORDS.length);
   });
 });
