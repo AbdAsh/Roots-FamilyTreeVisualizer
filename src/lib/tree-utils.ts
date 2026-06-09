@@ -22,7 +22,7 @@ import type {
 import { buildUnions } from '@/lib/layout/unions';
 import { assignTiers } from '@/lib/layout/tiers';
 import { connectedComponents } from '@/lib/layout/components';
-import { computeUnionLayout, COL_GAP } from '@/lib/layout/layout';
+import { computeUnionLayout, COL_GAP, TIER_GAP } from '@/lib/layout/layout';
 
 /**
  * Get all relationships for a specific member.
@@ -194,9 +194,19 @@ export function getInferredRelationships(
   }
 
   if (relType === 'parent') {
-    // Existing siblings should probably also be children of the new parent
+    // Existing siblings should probably also be children of the new parent —
+    // but only FULL siblings (those sharing the member's exact set of known
+    // parents). A half-sibling shares just one parent via a *different* other
+    // parent, so auto-assigning the new parent to them would wrongly
+    // over-connect blended families. (The chip still lets the user add others.)
+    const memberParentIds = new Set(getParents(memberId, tree).map((p) => p.id));
     const siblings = getSiblings(memberId, tree);
     for (const sib of siblings) {
+      const sibParentIds = new Set(getParents(sib.id, tree).map((p) => p.id));
+      const sameParents =
+        sibParentIds.size === memberParentIds.size &&
+        [...memberParentIds].every((id) => sibParentIds.has(id));
+      if (!sameParents) continue;
       suggestions.push({
         key: `also-parent-of-${sib.id}`,
         label: `Also parent of ${sib.name}`,
@@ -279,6 +289,29 @@ export interface TieredLayout {
 }
 
 
+/**
+ * Last-resort layout for a component whose union-aware pass threw (only deep
+ * pathological input). Places members on their tier rows in member order — no
+ * overlap, monotonic tiers, just not aesthetically optimal.
+ */
+function gridFallback(
+  component: Set<string>,
+  tierOf: Map<string, number>,
+): Map<string, { x: number; y: number }> {
+  const byTier = new Map<number, string[]>();
+  for (const id of component) {
+    const t = tierOf.get(id) ?? 0;
+    const arr = byTier.get(t) ?? [];
+    arr.push(id);
+    byTier.set(t, arr);
+  }
+  const pos = new Map<string, { x: number; y: number }>();
+  for (const [t, ids] of byTier) {
+    ids.forEach((id, i) => pos.set(id, { x: i * COL_GAP, y: t * TIER_GAP }));
+  }
+  return pos;
+}
+
 /* ═══════ Union-aware layered layout orchestrator ═══════ */
 
 /**
@@ -313,7 +346,19 @@ export function computeTieredLayout(tree: FamilyTree): TieredLayout | null {
   let packOffset = 0; // running x-offset for the next component
 
   for (const component of components) {
-    const local = computeUnionLayout(tree, component, unions, tierOf);
+    let local: Map<string, { x: number; y: number }>;
+    try {
+      local = computeUnionLayout(tree, component, unions, tierOf);
+    } catch (err) {
+      // Degrade gracefully instead of crashing the canvas. The recursive
+      // Buchheim walk can overflow the stack on a pathological lineage (e.g. a
+      // multi-thousand-deep chain from a tampered/hand-crafted URL hash — real
+      // trees can't reach this under the 8 KB hash budget). Fall back to a
+      // simple tier grid for just this component so everything else still
+      // renders. The ErrorBoundary is the outer net for anything else.
+      console.error('[layout] component layout failed; using grid fallback:', err);
+      local = gridFallback(component, tierOf);
+    }
     if (local.size === 0) continue;
 
     let xMin = Infinity;

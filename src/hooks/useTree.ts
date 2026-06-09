@@ -46,8 +46,8 @@ interface TreeState {
   clearTree: () => void;
 
   // Member operations
-  /** Add a new member to the tree. Returns the created member with a generated ID. */
-  addMember: (member: Omit<FamilyMember, 'id'>) => FamilyMember;
+  /** Add a new member to the tree. Returns the created member, or `null` if no tree is loaded. */
+  addMember: (member: Omit<FamilyMember, 'id'>) => FamilyMember | null;
   /** Update fields on an existing member. */
   updateMember: (id: string, updates: Partial<FamilyMember>) => void;
   /** Remove a member and all their relationships. */
@@ -77,7 +77,7 @@ interface TreeState {
     relativeTo: string,
     relType: 'parent' | 'child' | 'spouse' | 'sibling',
     member: Omit<FamilyMember, 'id'>,
-  ) => FamilyMember;
+  ) => FamilyMember | null;
 
   /**
    * Batch add: creates a member + primary relationship + resolved inferred relationships
@@ -93,7 +93,7 @@ interface TreeState {
     relType: 'parent' | 'child' | 'spouse' | 'sibling',
     member: Omit<FamilyMember, 'id'>,
     inferred: { type: RelationshipType; existingId: string; newIsFrom: boolean }[],
-  ) => FamilyMember;
+  ) => FamilyMember | null;
 
   // Undo / Redo
   /** Undo the last tree mutation by restoring the previous snapshot. */
@@ -175,6 +175,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     }),
 
   addMember: (memberData) => {
+    if (!get().tree) return null; // no tree loaded — don't hand back a phantom id
     const member: FamilyMember = { ...memberData, id: nanoid(10) };
     set((state) => {
       if (!state.tree) return state;
@@ -296,6 +297,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   addRelative: (relativeTo, relType, memberData) => {
     const { addMember, addRelationship } = get();
     const member = addMember(memberData);
+    if (!member) return null;
 
     switch (relType) {
       case 'parent':
@@ -316,6 +318,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   },
 
   addRelativeBatch: (relativeTo, relType, memberData, inferred) => {
+    if (!get().tree) return null; // no tree loaded — don't hand back a phantom id
     const member: FamilyMember = { ...memberData, id: nanoid(10) };
     set((state) => {
       if (!state.tree) return state;

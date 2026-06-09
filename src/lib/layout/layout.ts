@@ -38,8 +38,6 @@ export const SPOUSE_OFFSET = 120;
 
 /** Minimum centre-to-centre gap (px) between any two nodes on a tier. */
 const MIN_SEP = 80;
-/** Same gap expressed in layout units. */
-const MIN_SEP_UNITS = MIN_SEP / COL_GAP;
 /** Partner offset expressed in layout units. */
 const SPOUSE_UNITS = SPOUSE_OFFSET / COL_GAP;
 
@@ -117,7 +115,11 @@ function nRight(v: BNode): BNode | null {
  * sides via their half-widths, so this prevents overlap at the new placement.
  */
 function sep(left: BNode, right: BNode): number {
-  return left.halfRight + Math.max(1, MIN_SEP_UNITS) + right.halfLeft;
+  // Base gap of one column (1 unit = COL_GAP = 200px) between adjacent
+  // siblings, plus each node's reserved half-widths so symmetric couples don't
+  // collide. One column comfortably clears the MIN_SEP (80px) floor that the
+  // final re-centre pass enforces.
+  return left.halfRight + 1 + right.halfLeft;
 }
 
 function moveSub(wl: BNode, wr: BNode, sh: number) {

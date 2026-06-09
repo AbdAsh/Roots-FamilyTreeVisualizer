@@ -3,11 +3,28 @@ import type { Union } from './unions';
 
 class UF {
   private p = new Map<string, string>();
+  /** Iterative find with path compression — safe on long parent chains (no recursion). */
   find(x: string): string {
-    let r = this.p.get(x); if (r === undefined) { this.p.set(x, x); return x; }
-    if (r !== x) { r = this.find(r); this.p.set(x, r); } return r;
+    if (!this.p.has(x)) {
+      this.p.set(x, x);
+      return x;
+    }
+    let r = x;
+    while (this.p.get(r)! !== r) r = this.p.get(r)!;
+    // Compress the path so repeated lookups stay flat.
+    let cur = x;
+    while (cur !== r) {
+      const next = this.p.get(cur)!;
+      this.p.set(cur, r);
+      cur = next;
+    }
+    return r;
   }
-  union(a: string, b: string): void { const ra = this.find(a), rb = this.find(b); if (ra !== rb) this.p.set(ra, rb); }
+  union(a: string, b: string): void {
+    const ra = this.find(a),
+      rb = this.find(b);
+    if (ra !== rb) this.p.set(ra, rb);
+  }
 }
 
 export function assignTiers(tree: FamilyTree, unions: Union[]): {
@@ -19,47 +36,81 @@ export function assignTiers(tree: FamilyTree, unions: Union[]): {
   for (const u of unions) for (let i = 1; i < u.parentIds.length; i++) uf.union(u.parentIds[0], u.parentIds[i]);
 
   // class DAG: classOf(parent) -> classOf(child)
-  const adj = new Map<string, Set<string>>();
+  const adj = new Map<string, string[]>();
   for (const u of unions) {
     if (u.parentIds.length === 0) continue;
     const parentClass = uf.find(u.parentIds[0]);
     for (const c of u.childIds) {
       const cc = uf.find(c);
       if (cc === parentClass) continue;
-      let s = adj.get(parentClass);
-      if (!s) { s = new Set<string>(); adj.set(parentClass, s); }
-      s.add(cc);
+      let arr = adj.get(parentClass);
+      if (!arr) { arr = []; adj.set(parentClass, arr); }
+      if (!arr.includes(cc)) arr.push(cc);
     }
   }
-  // longest-path layering with DFS back-edge detection (drop cycles)
+
   const classes = [...new Set(tree.members.map((m) => uf.find(m.id)))];
-  const tier = new Map<string, number>(classes.map((c) => [c, 0]));
-  const state = new Map<string, 0 | 1 | 2>(); // 0=unvisited 1=onstack 2=done
-  const backEdges: [string, string][] = [];
-  function dfs(u: string): void {
-    state.set(u, 1);
-    for (const v of adj.get(u) ?? []) {
-      if (state.get(v) === 1) { backEdges.push([u, v]); continue; } // skip cycle edge
-      if (state.get(v) !== 2) dfs(v);
-      tier.set(v, Math.max(tier.get(v)!, tier.get(u)! + 1));
+
+  // ── Longest-path layering ──
+  // Iterative DFS (explicit stack — no recursion, so a multi-thousand-deep
+  // lineage can't overflow) produces a finish order and flags back-edges
+  // (cycles). Reverse-finish order is a topological order of the DAG, so a
+  // SINGLE relaxation pass computes longest paths in O(V+E) — the previous
+  // fixed-point loop was O(classes²·E) and degraded badly on large trees.
+  const WHITE = 0, GRAY = 1, BLACK = 2;
+  const color = new Map<string, 0 | 1 | 2>();
+  const finishOrder: string[] = [];
+  const backEdges = new Set<string>(); // `${u}->${v}`
+
+  for (const start of classes) {
+    if ((color.get(start) ?? WHITE) !== WHITE) continue;
+    const stack: { u: string; i: number }[] = [{ u: start, i: 0 }];
+    color.set(start, GRAY);
+    while (stack.length > 0) {
+      const frame = stack[stack.length - 1];
+      const nbrs = adj.get(frame.u);
+      if (nbrs && frame.i < nbrs.length) {
+        const v = nbrs[frame.i++];
+        const cv = color.get(v) ?? WHITE;
+        if (cv === GRAY) {
+          backEdges.add(`${frame.u}->${v}`); // cycle edge — skip in relaxation
+        } else if (cv === WHITE) {
+          color.set(v, GRAY);
+          stack.push({ u: v, i: 0 });
+        }
+        // BLACK: forward/cross edge to a finished node — fine, no action
+      } else {
+        color.set(frame.u, BLACK);
+        finishOrder.push(frame.u);
+        stack.pop();
+      }
     }
-    state.set(u, 2);
   }
-  // iterate to a fixed point for longest path across the DAG (small graphs)
-  for (let pass = 0; pass < classes.length; pass++) {
-    state.clear();
-    for (const c of classes) if (state.get(c) !== 2) dfs(c);
+
+  const tier = new Map<string, number>(classes.map((c) => [c, 0]));
+  // Relax in topological (reverse-finish) order; predecessors are finalised
+  // before each node, so one pass suffices.
+  for (let i = finishOrder.length - 1; i >= 0; i--) {
+    const u = finishOrder[i];
+    const nbrs = adj.get(u);
+    if (!nbrs) continue;
+    const tu = tier.get(u)!;
+    for (const v of nbrs) {
+      if (backEdges.has(`${u}->${v}`)) continue;
+      if (tu + 1 > (tier.get(v) ?? 0)) tier.set(v, tu + 1);
+    }
   }
+
   const tierOf = new Map<string, number>();
   for (const m of tree.members) tierOf.set(m.id, tier.get(uf.find(m.id))!);
-  // normalize so min tier = 0
-  const min = Math.min(...tierOf.values());
-  for (const [k, v] of tierOf) tierOf.set(k, v - min);
+  // normalize so min tier = 0 (loop, not Math.min(...spread), to stay safe on large trees)
+  let min = Infinity;
+  for (const v of tierOf.values()) if (v < min) min = v;
+  if (min !== 0 && min !== Infinity) for (const [k, v] of tierOf) tierOf.set(k, v - min);
 
   // referenceEdges: parent-child relationships whose class-edge was a back-edge
-  const refSet = new Set(backEdges.map(([a, b]) => `${a}->${b}`));
   const referenceEdges = tree.relationships.filter(
-    (r) => r.type === 'parent-child' && refSet.has(`${uf.find(r.from)}->${uf.find(r.to)}`),
+    (r) => r.type === 'parent-child' && backEdges.has(`${uf.find(r.from)}->${uf.find(r.to)}`),
   );
   return { tierOf, referenceEdges };
 }
