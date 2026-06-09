@@ -50,7 +50,11 @@ export async function saveToHash(
   const encrypted = await encryptBytes(compressed, passphrase); // Uint8Array
   const encoded = uint8ToBase64url(encrypted); // URL-safe string
 
-  window.location.hash = encoded;
+  // Write the hash WITHOUT pushing a new history entry: keeps the browser back
+  // button from rewinding through every autosave, and lets the save-time unload
+  // guard cleanly cover "back" too (with no intermediate entries, back leaves
+  // the page → beforeunload fires).
+  window.history.replaceState(null, '', '#' + encoded);
 
   const size = byteSize(encoded);
   return {

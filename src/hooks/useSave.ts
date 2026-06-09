@@ -53,5 +53,24 @@ export function useSave() {
     return () => clearTimeout(timerRef.current);
   }, [tree, passphrase]);
 
+  // --- Navigation guard while a save is in flight --------------------------
+  // The tree only persists once saveToHash() writes the URL hash; closing,
+  // reloading, quitting, or navigating away before that completes would lose
+  // the latest edit. While status === 'saving' we block unload with the native
+  // browser confirmation. Saves use history.replaceState (no extra history
+  // entries), so "back" leaves the page and is caught here too.
+  const savingRef = useRef(false);
+  savingRef.current = status === 'saving';
+
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!savingRef.current) return;
+      e.preventDefault();
+      e.returnValue = ''; // legacy browsers require a returnValue to show the prompt
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, []);
+
   return { status, capacity };
 }
