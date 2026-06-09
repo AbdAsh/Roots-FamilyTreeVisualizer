@@ -75,6 +75,7 @@ export interface Translations {
     familyNamePlaceholder: string;
     passphrase: string;
     choosePassphrase: string;
+    generatePassphrase: string;
     enterPassphrase: string;
     passphraseHint: string;
     passphraseTooShort: string;
@@ -238,6 +239,7 @@ const en: Translations = {
     familyNamePlaceholder: 'The Smith Family',
     passphrase: 'Passphrase',
     choosePassphrase: 'Choose a passphrase',
+    generatePassphrase: 'Generate',
     enterPassphrase: 'Enter passphrase',
     passphraseHint:
       'This passphrase encrypts your family tree. Share it with family members along with the link — there is no way to recover it if lost.',
@@ -406,6 +408,7 @@ const ar: Translations = {
     familyNamePlaceholder: 'عائلة الأحمد',
     passphrase: 'كلمة المرور',
     choosePassphrase: 'اختر كلمة مرور',
+    generatePassphrase: 'توليد',
     enterPassphrase: 'أدخل كلمة المرور',
     passphraseHint:
       'كلمة المرور هذه تُشفّر شجرة عائلتك. شاركها مع أفراد العائلة مع الرابط — لا توجد طريقة لاستعادتها إذا فُقدت.',
@@ -572,6 +575,7 @@ const tr: Translations = {
     familyNamePlaceholder: 'Yılmaz Ailesi',
     passphrase: 'Parola',
     choosePassphrase: 'Bir parola seçin',
+    generatePassphrase: 'Oluştur',
     enterPassphrase: 'Parolayı girin',
     passphraseHint:
       'Bu parola aile ağacınızı şifreler. Aile üyelerinizle bağlantıyla birlikte paylaşın — kaybedildiğinde kurtarma yolu yoktur.',

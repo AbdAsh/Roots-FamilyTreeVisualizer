@@ -1,9 +1,10 @@
 import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Plus, Eye, EyeOff, RotateCcw, Sun, Moon } from 'lucide-react';
+import { Lock, Plus, Eye, EyeOff, RotateCcw, Sun, Moon, Dices } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { RootsMark } from '@/components/ui/RootsMark';
 import { Input } from '@/components/ui/Input';
+import { generatePassphrase } from '@/lib/generate-passphrase';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAuthStore } from '@/hooks/useAuth';
@@ -86,6 +87,13 @@ export function PassphraseScreen() {
     strength,
     strings,
   ]);
+
+  const handleGenerate = useCallback(() => {
+    setPassphrase(generatePassphrase());
+    setShowPass(true); // reveal so the user can read and save it (no recovery if lost)
+    if (error) clearError();
+    setStrengthWarning(null);
+  }, [error, clearError]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -176,6 +184,16 @@ export function PassphraseScreen() {
             >
               {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
+            {isNewTree && (
+              <button
+                type="button"
+                onClick={handleGenerate}
+                className="absolute end-0 top-0 flex items-center gap-1 text-xs font-medium text-amber hover:text-amber-light transition-colors cursor-pointer"
+              >
+                <Dices size={13} />
+                {strings.auth.generatePassphrase}
+              </button>
+            )}
           </div>
 
           {/* Strength meter (new tree only) */}
