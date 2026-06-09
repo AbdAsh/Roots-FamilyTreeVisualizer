@@ -216,7 +216,7 @@ export interface Translations {
 const en: Translations = {
   app: {
     title: 'Roots',
-    seoH1: 'Roots — Free Encrypted Family Tree Maker',
+    seoH1: 'Roots — Free Encrypted Family Tree Maker (No Account)',
     memberCount: '{count} member||{count} members',
     share: 'Share',
     lock: 'Lock',
@@ -384,7 +384,7 @@ const en: Translations = {
 const ar: Translations = {
   app: {
     title: 'جذور',
-    seoH1: 'جذور — أداة مجانية ومشفّرة لرسم شجرة العائلة',
+    seoH1: 'جذور — أداة مجانية ومشفّرة لرسم شجرة العائلة (بدون حساب)',
     memberCount: '{count} عضو||{count} أعضاء',
     share: 'مشاركة',
     lock: 'قفل',
@@ -401,7 +401,7 @@ const ar: Translations = {
     plantTree: 'ازرع شجرة عائلتك',
     unlockTree: 'افتح شجرة عائلة مشتركة',
     conceptLine:
-      'شجرة عائلتك بأكملها موجودة داخل رابطها الخاص، محمية بعبارة مرور. بلا حسابات، بلا خوادم.',
+      'شجرة عائلتك بأكملها موجودة داخل رابطها الخاص، محمية بكلمة مرور. بلا حسابات، بلا خوادم.',
     familyName: 'اسم العائلة',
     familyNamePlaceholder: 'عائلة الأحمد',
     passphrase: 'كلمة المرور',
@@ -501,12 +501,12 @@ const ar: Translations = {
     linkTitle: 'الرابط هو قاعدة البيانات',
     linkBody:
       'يتم ضغط شجرتك وتعبئتها داخل رابط الصفحة نفسه — لا يوجد خادم يخزّنها.',
-    cryptoTitle: 'مشفّرة بعبارة مرورك',
+    cryptoTitle: 'مشفّرة بكلمة مرورك',
     cryptoBody:
-      'الرابط مشفّر بخوارزمية AES-256-GCM. عبارة مرورك لا تغادر متصفحك أبدًا؛ وبدونها يظل الرابط غير قابل للقراءة.',
+      'الرابط مشفّر بخوارزمية AES-256-GCM. كلمة مرورك لا تغادر متصفحك أبدًا؛ وبدونها يظل الرابط غير قابل للقراءة.',
     shareTitle: 'المشاركة',
     shareBody:
-      'أرسل الرابط وعبارة المرور إلى شخص ما وسيتمكن من عرض الشجرة أو تعديلها. التغييرات تبقى في نسخته الخاصة من الرابط.',
+      'أرسل الرابط وكلمة المرور إلى شخص ما وسيتمكن من عرض الشجرة أو تعديلها. التغييرات تبقى في نسخته الخاصة من الرابط.',
     exportTitle: 'التصدير والاستيراد',
     exportBody:
       'احفظ شجرتك بصيغة JSON أو PNG أو SVG، واستورد ملفات JSON مجددًا.',
@@ -542,7 +542,7 @@ const ar: Translations = {
     addRelatives:
       'اضغط على شخص، ثم استخدم + لإضافة والدين أو شريك أو أبناء أو أشقاء.',
     share:
-      'المشاركة تنسخ رابطاً — يستطيع أي شخص يمتلكه مع عبارة المرور العرض والتعديل.',
+      'المشاركة تنسخ رابطاً — يستطيع أي شخص يمتلكه مع كلمة المرور العرض والتعديل.',
   },
 };
 
@@ -550,7 +550,7 @@ const ar: Translations = {
 const tr: Translations = {
   app: {
     title: 'Kökler',
-    seoH1: 'Kökler — Ücretsiz Şifreli Soy Ağacı Oluşturucu',
+    seoH1: 'Kökler — Ücretsiz Şifreli Soy Ağacı Oluşturucu (Hesapsız)',
     memberCount: '{count} üye||{count} üye',
     share: 'Paylaş',
     lock: 'Kilitle',
