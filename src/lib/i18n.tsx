@@ -216,7 +216,7 @@ export interface Translations {
 const en: Translations = {
   app: {
     title: 'Roots',
-    seoH1: 'Roots — Free Family Tree Maker',
+    seoH1: 'Roots — Free Encrypted Family Tree Maker',
     memberCount: '{count} member||{count} members',
     share: 'Share',
     lock: 'Lock',
@@ -384,7 +384,7 @@ const en: Translations = {
 const ar: Translations = {
   app: {
     title: 'جذور',
-    seoH1: 'جذور — أداة مجانية لرسم شجرة العائلة',
+    seoH1: 'جذور — أداة مجانية ومشفّرة لرسم شجرة العائلة',
     memberCount: '{count} عضو||{count} أعضاء',
     share: 'مشاركة',
     lock: 'قفل',
@@ -550,7 +550,7 @@ const ar: Translations = {
 const tr: Translations = {
   app: {
     title: 'Kökler',
-    seoH1: 'Kökler — Ücretsiz Soy Ağacı Oluşturucu',
+    seoH1: 'Kökler — Ücretsiz Şifreli Soy Ağacı Oluşturucu',
     memberCount: '{count} üye||{count} üye',
     share: 'Paylaş',
     lock: 'Kilitle',
