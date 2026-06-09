@@ -53,23 +53,34 @@ export interface Translations {
   // App chrome
   app: {
     title: string;
+    seoH1: string; // keyword-bearing, screen-reader-only H1 for the landing page
     memberCount: string; // "{count} member" / "{count} members"
     share: string;
     lock: string;
-    search: string;
     searchPlaceholder: string;
+    clearSearch: string;
     noMembers: string;
-    hintAddRelative: string;
+    firstPersonPrompt: string;
     language: string;
+    toggleTheme: string;
+    menu: string;
+    close: string;
+    zoomIn: string;
+    zoomOut: string;
+    fitToView: string;
+    privacy: string;
+    canvasLabel: string;
   };
   // Passphrase screen
   auth: {
     plantTree: string;
     unlockTree: string;
+    conceptLine: string;
     familyName: string;
     familyNamePlaceholder: string;
     passphrase: string;
     choosePassphrase: string;
+    generatePassphrase: string;
     enterPassphrase: string;
     passphraseHint: string;
     passphraseTooShort: string;
@@ -119,23 +130,17 @@ export interface Translations {
   };
   // Add relative panel
   addRelative: {
-    title: string;
     parent: string;
     child: string;
     spouseLabel: string;
     sibling: string;
-    addParentOf: string; // "{name}"
-    addChildOf: string;
-    addSpouseOf: string;
-    addSiblingOf: string;
     name: string;
     additionalRels: string;
+    specialCaseHint: string;
     alsoChildOf: string; // "{name}"
     alsoParentOf: string; // "{name}"
     alsoSiblingOf: string; // "{name}"
     spouseOf: string; // "{name}"
-    uncheckHint: string;
-    add: string; // "Add {type}"
     cancel: string;
   };
   // Confirm modal
@@ -157,20 +162,6 @@ export interface Translations {
   // About modal
   about: {
     title: string;
-    whatIsRoots: string;
-    whatIsRootsDesc: string;
-    howItWorks: string;
-    howItWorksDesc: string;
-    pipeline: string;
-    layoutAlgorithm: string;
-    layoutAlgorithmDesc: string;
-    encryption: string;
-    encryptionDesc: string;
-    compression: string;
-    compressionDesc: string;
-    privacy: string;
-    privacyDesc: string;
-    techStack: string;
     openSource: string;
     openSourceDesc: string;
     developer: string;
@@ -178,6 +169,20 @@ export interface Translations {
     viewWebsite: string;
     viewGithub: string;
     viewLinkedin: string;
+    // Plain-language content sections (A5)
+    whatTitle: string;
+    whatBody: string;
+    linkTitle: string;
+    linkBody: string;
+    cryptoTitle: string;
+    cryptoBody: string;
+    shareTitle: string;
+    shareBody: string;
+    exportTitle: string;
+    exportBody: string;
+    langTitle: string;
+    langBody: string;
+    sizeNote: string;
   };
   // Legend
   legend: {
@@ -205,16 +210,12 @@ export interface Translations {
     saving: string;
     saved: string;
     error: string;
-    capacity: string;
   };
-  // Keyboard shortcuts
-  shortcuts: {
-    title: string;
-    escape: string;
-    deleteKey: string;
-    undo: string;
-    redo: string;
-    search: string;
+  // Walkthrough hints (HintBar)
+  hints: {
+    addRelatives: string;
+    share: string;
+    dismiss: string;
   };
 }
 
@@ -222,23 +223,34 @@ export interface Translations {
 const en: Translations = {
   app: {
     title: 'Roots',
+    seoH1: 'Roots — Free Encrypted Family Tree Maker (No Account)',
     memberCount: '{count} member||{count} members',
     share: 'Share',
     lock: 'Lock',
-    search: 'Search',
     searchPlaceholder: 'Search members…',
+    clearSearch: 'Clear search',
     noMembers: 'No family members yet',
-    hintAddRelative:
-      'Click ＋ on a node to add relatives, or click the node to edit',
+    firstPersonPrompt: 'Add the first person — usually you',
     language: 'Language',
+    toggleTheme: 'Toggle theme',
+    menu: 'Menu',
+    close: 'Close',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    fitToView: 'Fit to view',
+    privacy: 'Privacy',
+    canvasLabel: 'Family tree canvas — use arrow keys to pan',
   },
   auth: {
     plantTree: 'Plant your family tree',
     unlockTree: 'Unlock a shared family tree',
+    conceptLine:
+      'Your whole family tree lives inside its own link, locked by a passphrase. No accounts, no servers.',
     familyName: 'Family Name',
     familyNamePlaceholder: 'The Smith Family',
     passphrase: 'Passphrase',
     choosePassphrase: 'Choose a passphrase',
+    generatePassphrase: 'Generate',
     enterPassphrase: 'Enter passphrase',
     passphraseHint:
       'This passphrase encrypts your family tree. Share it with family members along with the link — there is no way to recover it if lost.',
@@ -291,24 +303,18 @@ const en: Translations = {
       'Remove the {type} relationship between {from} and {to}?',
   },
   addRelative: {
-    title: 'Add Relative',
     parent: 'Parent',
     child: 'Child',
     spouseLabel: 'Spouse',
     sibling: 'Sibling',
-    addParentOf: 'Add a parent of {name}',
-    addChildOf: 'Add a child of {name}',
-    addSpouseOf: 'Add a spouse of {name}',
-    addSiblingOf: 'Add a sibling of {name}',
     name: 'Name',
-    additionalRels: 'Additional relationships',
+    additionalRels: 'Additional links',
+    specialCaseHint:
+      "Linked automatically. Uncheck any that don't apply — for example, a half-sibling with a different parent, or a step-parent.",
     alsoChildOf: 'Also a child of {name}',
     alsoParentOf: 'Also parent of {name}',
     alsoSiblingOf: 'Also sibling of {name}',
     spouseOf: 'Spouse of {name}',
-    uncheckHint:
-      'Uncheck for cases like half-siblings, adoption, or step-parents',
-    add: 'Add {type}',
     cancel: 'Cancel',
   },
   confirm: {
@@ -330,27 +336,6 @@ const en: Translations = {
   },
   about: {
     title: 'About Roots',
-    whatIsRoots: 'What is Roots?',
-    whatIsRootsDesc:
-      'Roots is a zero-backend family tree visualizer. Your entire family tree is encrypted and stored in the URL — no servers, no databases, no accounts. Share a link and a passphrase, and your family can view and edit the tree.',
-    howItWorks: 'How It Works',
-    howItWorksDesc:
-      'The family tree data flows through a pipeline entirely in your browser:',
-    pipeline:
-      'JSON → Brotli Compress → AES-256-GCM Encrypt → Base64url → URL Hash',
-    layoutAlgorithm: 'Layout Algorithm',
-    layoutAlgorithmDesc:
-      'The tree visualization uses the Buchheim-Reingold-Tilford algorithm — an O(n) layout that guarantees parents are centred over their children, subtrees never overlap, and identical subtrees are drawn identically. Spouse pairs are merged into couple containers.',
-    encryption: 'Encryption',
-    encryptionDesc:
-      'AES-256-GCM via the Web Crypto API. Keys are derived with PBKDF2 (600,000 iterations). Each save generates a fresh random salt (16 bytes) and IV (12 bytes). The passphrase never leaves memory.',
-    compression: 'Compression',
-    compressionDesc:
-      "Brotli compression (quality 11) via WebAssembly — runs before encryption because encrypted bytes have maximum entropy and don't compress. This maximises space savings within the ~8 KB URL limit.",
-    privacy: 'Privacy',
-    privacyDesc:
-      'No server. No cookies. No tracking. No analytics. Your data never leaves the browser. The passphrase is held in memory only and cleared when you lock the tree.',
-    techStack: 'Tech Stack',
     openSource: 'Open Source',
     openSourceDesc:
       'Roots is open source under the Apache 2.0 license. Contributions are welcome!',
@@ -359,6 +344,23 @@ const en: Translations = {
     viewWebsite: 'Website',
     viewGithub: 'GitHub',
     viewLinkedin: 'LinkedIn',
+    whatTitle: 'What is Roots?',
+    whatBody: 'A private family-tree maker that runs entirely in your browser.',
+    linkTitle: 'The link is the database',
+    linkBody:
+      "Your tree is compressed and packed into the page link itself — there's no server storing it.",
+    cryptoTitle: 'Encrypted with your passphrase',
+    cryptoBody:
+      'The link is encrypted with AES-256-GCM. Your passphrase never leaves your browser; without it the link is unreadable.',
+    shareTitle: 'Sharing',
+    shareBody:
+      'Send someone the link and the passphrase and they can view or edit the tree. Changes live only in their copy of the link.',
+    exportTitle: 'Export & import',
+    exportBody: 'Save your tree as JSON, PNG, or SVG, and import JSON back.',
+    langTitle: 'Languages',
+    langBody: 'English, Arabic (right-to-left), and Turkish.',
+    sizeNote:
+      'Because the whole tree fits in a link, very large trees may hit a size limit.',
   },
   legend: {
     title: 'Legend',
@@ -382,15 +384,13 @@ const en: Translations = {
     saving: 'Saving…',
     saved: 'Saved',
     error: 'Save failed',
-    capacity: '{percent}%',
   },
-  shortcuts: {
-    title: 'Keyboard Shortcuts',
-    escape: 'Close panel',
-    deleteKey: 'Delete selected member',
-    undo: 'Undo',
-    redo: 'Redo',
-    search: 'Focus search',
+  hints: {
+    addRelatives:
+      'Tap a person, then use + to add parents, a partner, children, or siblings.',
+    share:
+      'Share copies a link — anyone with it and the passphrase can view and edit.',
+    dismiss: 'Dismiss',
   },
 };
 
@@ -398,23 +398,34 @@ const en: Translations = {
 const ar: Translations = {
   app: {
     title: 'جذور',
+    seoH1: 'جذور — أداة مجانية ومشفّرة لرسم شجرة العائلة (بدون حساب)',
     memberCount: '{count} عضو||{count} أعضاء',
     share: 'مشاركة',
     lock: 'قفل',
-    search: 'بحث',
     searchPlaceholder: 'البحث عن الأعضاء…',
+    clearSearch: 'مسح البحث',
     noMembers: 'لا يوجد أفراد في العائلة بعد',
-    hintAddRelative:
-      'انقر على ＋ بجانب العقدة لإضافة أقارب، أو انقر على العقدة للتعديل',
+    firstPersonPrompt: 'أضف أول شخص — غالباً أنت',
     language: 'اللغة',
+    toggleTheme: 'تبديل السمة',
+    menu: 'القائمة',
+    close: 'إغلاق',
+    zoomIn: 'تكبير',
+    zoomOut: 'تصغير',
+    fitToView: 'ملاءمة العرض',
+    privacy: 'الخصوصية',
+    canvasLabel: 'لوحة شجرة العائلة — استخدم مفاتيح الأسهم للتحريك',
   },
   auth: {
     plantTree: 'ازرع شجرة عائلتك',
     unlockTree: 'افتح شجرة عائلة مشتركة',
+    conceptLine:
+      'شجرة عائلتك بأكملها موجودة داخل رابطها الخاص، محمية بكلمة مرور. بلا حسابات، بلا خوادم.',
     familyName: 'اسم العائلة',
     familyNamePlaceholder: 'عائلة الأحمد',
     passphrase: 'كلمة المرور',
     choosePassphrase: 'اختر كلمة مرور',
+    generatePassphrase: 'توليد',
     enterPassphrase: 'أدخل كلمة المرور',
     passphraseHint:
       'كلمة المرور هذه تُشفّر شجرة عائلتك. شاركها مع أفراد العائلة مع الرابط — لا توجد طريقة لاستعادتها إذا فُقدت.',
@@ -465,24 +476,18 @@ const ar: Translations = {
     removeRelConfirmMessage: 'حذف علاقة {type} بين {from} و {to}؟',
   },
   addRelative: {
-    title: 'إضافة قريب',
     parent: 'والد/ة',
     child: 'ابن/ة',
     spouseLabel: 'زوج/ة',
     sibling: 'شقيق/ة',
-    addParentOf: 'إضافة والد/ة لـ {name}',
-    addChildOf: 'إضافة ابن/ة لـ {name}',
-    addSpouseOf: 'إضافة زوج/ة لـ {name}',
-    addSiblingOf: 'إضافة شقيق/ة لـ {name}',
     name: 'الاسم',
-    additionalRels: 'علاقات إضافية',
+    additionalRels: 'روابط إضافية',
+    specialCaseHint:
+      'تُربط تلقائياً. ألغِ تحديد ما لا ينطبق — مثلاً أخ غير شقيق من والد مختلف، أو زوج/ة أحد الوالدين.',
     alsoChildOf: 'أيضاً ابن/ة لـ {name}',
     alsoParentOf: 'أيضاً والد/ة لـ {name}',
     alsoSiblingOf: 'أيضاً شقيق/ة لـ {name}',
     spouseOf: 'زوج/ة {name}',
-    uncheckHint:
-      'ألغِ التحديد في حالات مثل الأشقاء من أب/أم فقط أو التبني أو زوج/ة الأب/الأم',
-    add: 'إضافة {type}',
     cancel: 'إلغاء',
   },
   confirm: {
@@ -503,25 +508,6 @@ const ar: Translations = {
   },
   about: {
     title: 'حول جذور',
-    whatIsRoots: 'ما هو جذور؟',
-    whatIsRootsDesc:
-      'جذور هو تطبيق لعرض شجرة العائلة بدون خوادم. يتم تشفير شجرة عائلتك بالكامل وتخزينها في الرابط — بدون خوادم، بدون قواعد بيانات، بدون حسابات. شارك الرابط وكلمة المرور، وسيتمكن أفراد عائلتك من عرض الشجرة وتعديلها.',
-    howItWorks: 'كيف يعمل',
-    howItWorksDesc: 'تمر بيانات شجرة العائلة عبر خط أنابيب بالكامل في متصفحك:',
-    pipeline: 'JSON → ضغط Brotli → تشفير AES-256-GCM → Base64url → رابط URL',
-    layoutAlgorithm: 'خوارزمية التخطيط',
-    layoutAlgorithmDesc:
-      'يستخدم عرض الشجرة خوارزمية Buchheim-Reingold-Tilford — تخطيط بتعقيد O(n) يضمن أن الآباء في المنتصف فوق أبنائهم، والأشجار الفرعية لا تتداخل أبداً، والأشجار الفرعية المتماثلة تُرسم بشكل متماثل.',
-    encryption: 'التشفير',
-    encryptionDesc:
-      'AES-256-GCM عبر Web Crypto API. يتم اشتقاق المفاتيح باستخدام PBKDF2 (٦٠٠,٠٠٠ تكرار). كل حفظ يولّد ملح عشوائي جديد (١٦ بايت) و IV (١٢ بايت). كلمة المرور لا تغادر الذاكرة أبداً.',
-    compression: 'الضغط',
-    compressionDesc:
-      'ضغط Brotli (جودة ١١) عبر WebAssembly — يتم قبل التشفير لأن البايتات المشفرة لا تنضغط. هذا يزيد توفير المساحة ضمن حد الرابط ~٨ كيلوبايت.',
-    privacy: 'الخصوصية',
-    privacyDesc:
-      'لا خوادم. لا ملفات تعريف ارتباط. لا تتبع. لا تحليلات. بياناتك لا تغادر المتصفح أبداً. كلمة المرور محفوظة في الذاكرة فقط وتُمسح عند قفل الشجرة.',
-    techStack: 'التقنيات المستخدمة',
     openSource: 'مفتوح المصدر',
     openSourceDesc:
       'جذور مفتوح المصدر بموجب رخصة Apache 2.0. المساهمات مرحب بها!',
@@ -530,6 +516,24 @@ const ar: Translations = {
     viewWebsite: 'الموقع',
     viewGithub: 'GitHub',
     viewLinkedin: 'LinkedIn',
+    whatTitle: 'ما هو جذور؟',
+    whatBody: 'أداة خاصة لإنشاء شجرة العائلة تعمل بالكامل داخل متصفحك.',
+    linkTitle: 'الرابط هو قاعدة البيانات',
+    linkBody:
+      'يتم ضغط شجرتك وتعبئتها داخل رابط الصفحة نفسه — لا يوجد خادم يخزّنها.',
+    cryptoTitle: 'مشفّرة بكلمة مرورك',
+    cryptoBody:
+      'الرابط مشفّر بخوارزمية AES-256-GCM. كلمة مرورك لا تغادر متصفحك أبدًا؛ وبدونها يظل الرابط غير قابل للقراءة.',
+    shareTitle: 'المشاركة',
+    shareBody:
+      'أرسل الرابط وكلمة المرور إلى شخص ما وسيتمكن من عرض الشجرة أو تعديلها. التغييرات تبقى في نسخته الخاصة من الرابط.',
+    exportTitle: 'التصدير والاستيراد',
+    exportBody:
+      'احفظ شجرتك بصيغة JSON أو PNG أو SVG، واستورد ملفات JSON مجددًا.',
+    langTitle: 'اللغات',
+    langBody: 'الإنجليزية، والعربية (من اليمين إلى اليسار)، والتركية.',
+    sizeNote:
+      'نظرًا لأن الشجرة بأكملها تُخزَّن في رابط، فقد تصل الأشجار الكبيرة جدًا إلى حد الحجم المسموح به.',
   },
   legend: {
     title: 'دليل الرموز',
@@ -553,15 +557,13 @@ const ar: Translations = {
     saving: 'جارٍ الحفظ…',
     saved: 'تم الحفظ',
     error: 'فشل الحفظ',
-    capacity: '{percent}%',
   },
-  shortcuts: {
-    title: 'اختصارات لوحة المفاتيح',
-    escape: 'إغلاق اللوحة',
-    deleteKey: 'حذف العضو المحدد',
-    undo: 'تراجع',
-    redo: 'إعادة',
-    search: 'البحث',
+  hints: {
+    addRelatives:
+      'اضغط على شخص، ثم استخدم + لإضافة والدين أو شريك أو أبناء أو أشقاء.',
+    share:
+      'المشاركة تنسخ رابطاً — يستطيع أي شخص يمتلكه مع كلمة المرور العرض والتعديل.',
+    dismiss: 'تجاهل',
   },
 };
 
@@ -569,23 +571,34 @@ const ar: Translations = {
 const tr: Translations = {
   app: {
     title: 'Kökler',
+    seoH1: 'Kökler — Ücretsiz Şifreli Soy Ağacı Oluşturucu (Hesapsız)',
     memberCount: '{count} üye||{count} üye',
     share: 'Paylaş',
     lock: 'Kilitle',
-    search: 'Ara',
     searchPlaceholder: 'Üye ara…',
+    clearSearch: 'Aramayı temizle',
     noMembers: 'Henüz aile üyesi yok',
-    hintAddRelative:
-      'Akraba eklemek için düğümdeki ＋ işaretine, düzenlemek için düğüme tıklayın',
+    firstPersonPrompt: 'İlk kişiyi ekleyin — genellikle siz',
     language: 'Dil',
+    toggleTheme: 'Temayı değiştir',
+    menu: 'Menü',
+    close: 'Kapat',
+    zoomIn: 'Yakınlaştır',
+    zoomOut: 'Uzaklaştır',
+    fitToView: 'Ekrana sığdır',
+    privacy: 'Gizlilik',
+    canvasLabel: 'Soy ağacı tuvali — kaydırmak için ok tuşlarını kullanın',
   },
   auth: {
     plantTree: 'Aile ağacınızı oluşturun',
     unlockTree: 'Paylaşılan bir aile ağacını açın',
+    conceptLine:
+      'Tüm aile ağacın kendi bağlantısının içinde yaşar, bir parolayla kilitlenir. Hesap yok, sunucu yok.',
     familyName: 'Aile Adı',
     familyNamePlaceholder: 'Yılmaz Ailesi',
     passphrase: 'Parola',
     choosePassphrase: 'Bir parola seçin',
+    generatePassphrase: 'Oluştur',
     enterPassphrase: 'Parolayı girin',
     passphraseHint:
       'Bu parola aile ağacınızı şifreler. Aile üyelerinizle bağlantıyla birlikte paylaşın — kaybedildiğinde kurtarma yolu yoktur.',
@@ -638,24 +651,18 @@ const tr: Translations = {
       '{from} ile {to} arasındaki {type} ilişkisi silinsin mi?',
   },
   addRelative: {
-    title: 'Akraba Ekle',
     parent: 'Ebeveyn',
     child: 'Çocuk',
     spouseLabel: 'Eş',
     sibling: 'Kardeş',
-    addParentOf: '{name} için ebeveyn ekle',
-    addChildOf: '{name} için çocuk ekle',
-    addSpouseOf: '{name} için eş ekle',
-    addSiblingOf: '{name} için kardeş ekle',
     name: 'Ad',
-    additionalRels: 'Ek ilişkiler',
+    additionalRels: 'Ek bağlantılar',
+    specialCaseHint:
+      'Otomatik olarak bağlanır. Geçerli olmayanların işaretini kaldırın — örneğin farklı bir ebeveyni olan üvey kardeş ya da üvey anne/baba.',
     alsoChildOf: 'Ayrıca {name} çocuğu',
     alsoParentOf: 'Ayrıca {name} ebeveyni',
     alsoSiblingOf: 'Ayrıca {name} kardeşi',
     spouseOf: '{name} eşi',
-    uncheckHint:
-      'Üvey kardeş, evlat edinme veya üvey ebeveyn gibi durumlarda işareti kaldırın',
-    add: '{type} Ekle',
     cancel: 'İptal',
   },
   confirm: {
@@ -677,27 +684,6 @@ const tr: Translations = {
   },
   about: {
     title: 'Kökler Hakkında',
-    whatIsRoots: 'Kökler Nedir?',
-    whatIsRootsDesc:
-      "Kökler, sunucusuz bir aile ağacı görselleştiricisidir. Aile ağacınızın tamamı şifrelenerek URL'de saklanır — sunucu yok, veritabanı yok, hesap yok. Bir bağlantı ve parola paylaşın, aileniz ağacı görüntüleyip düzenleyebilsin.",
-    howItWorks: 'Nasıl Çalışır',
-    howItWorksDesc:
-      'Aile ağacı verileri tamamen tarayıcınızda bir işlem hattından geçer:',
-    pipeline:
-      'JSON → Brotli Sıkıştırma → AES-256-GCM Şifreleme → Base64url → URL Hash',
-    layoutAlgorithm: 'Yerleşim Algoritması',
-    layoutAlgorithmDesc:
-      'Ağaç görselleştirmesi Buchheim-Reingold-Tilford algoritmasını kullanır — ebeveynlerin çocuklarının üzerinde ortalandığını, alt ağaçların hiç çakışmadığını ve özdeş alt ağaçların aynı şekilde çizildiğini garanti eden O(n) bir yerleşim.',
-    encryption: 'Şifreleme',
-    encryptionDesc:
-      'Web Crypto API ile AES-256-GCM. Anahtarlar PBKDF2 (600.000 iterasyon) ile türetilir. Her kayıtta yeni rastgele tuz (16 bayt) ve IV (12 bayt) üretilir. Parola asla bellekten çıkmaz.',
-    compression: 'Sıkıştırma',
-    compressionDesc:
-      'WebAssembly ile Brotli sıkıştırma (kalite 11) — şifreleme öncesi uygulanır çünkü şifreli baytlar sıkıştırılamaz. Bu, ~8 KB URL sınırı içinde maksimum alan tasarrufu sağlar.',
-    privacy: 'Gizlilik',
-    privacyDesc:
-      'Sunucu yok. Çerez yok. Takip yok. Analitik yok. Verileriniz tarayıcıdan asla çıkmaz. Parola yalnızca bellekte tutulur ve ağaç kilitlendiğinde silinir.',
-    techStack: 'Teknoloji Yığını',
     openSource: 'Açık Kaynak',
     openSourceDesc:
       'Kökler, Apache 2.0 lisansı altında açık kaynaklıdır. Katkılar memnuniyetle karşılanır!',
@@ -706,6 +692,25 @@ const tr: Translations = {
     viewWebsite: 'Web Sitesi',
     viewGithub: 'GitHub',
     viewLinkedin: 'LinkedIn',
+    whatTitle: 'Kökler Nedir?',
+    whatBody:
+      'Tamamen tarayıcınızda çalışan, gizli bir aile ağacı oluşturma aracı.',
+    linkTitle: 'Bağlantı veritabanıdır',
+    linkBody:
+      'Ağacınız sıkıştırılarak sayfa bağlantısının içine paketlenir — onu depolayan herhangi bir sunucu yoktur.',
+    cryptoTitle: 'Parolanızla şifreli',
+    cryptoBody:
+      'Bağlantı AES-256-GCM ile şifrelenir. Parolanız tarayıcınızı asla terk etmez; parolasız bağlantı okunamaz.',
+    shareTitle: 'Paylaşım',
+    shareBody:
+      'Birine bağlantıyı ve parolayı gönderin; ağacı görüntüleyebilir veya düzenleyebilir. Değişiklikler yalnızca onların bağlantı kopyasında yaşar.',
+    exportTitle: 'Dışa ve içe aktarma',
+    exportBody:
+      'Ağacınızı JSON, PNG veya SVG olarak kaydedin ve JSON dosyalarını geri içe aktarın.',
+    langTitle: 'Diller',
+    langBody: 'İngilizce, Arapça (sağdan sola) ve Türkçe.',
+    sizeNote:
+      'Tüm ağaç bir bağlantıya sığdığından, çok büyük ağaçlar boyut sınırına ulaşabilir.',
   },
   legend: {
     title: 'Açıklama',
@@ -730,15 +735,13 @@ const tr: Translations = {
     saving: 'Kaydediliyor…',
     saved: 'Kaydedildi',
     error: 'Kayıt başarısız',
-    capacity: '%{percent}',
   },
-  shortcuts: {
-    title: 'Klavye Kısayolları',
-    escape: 'Paneli kapat',
-    deleteKey: 'Seçili üyeyi sil',
-    undo: 'Geri al',
-    redo: 'Yinele',
-    search: 'Aramaya odaklan',
+  hints: {
+    addRelatives:
+      'Bir kişiye dokunun, ardından ebeveyn, partner, çocuk veya kardeş eklemek için + kullanın.',
+    share:
+      'Paylaş bir bağlantı kopyalar — bağlantıya ve parolaya sahip herkes görüntüleyip düzenleyebilir.',
+    dismiss: 'Yoksay',
   },
 };
 

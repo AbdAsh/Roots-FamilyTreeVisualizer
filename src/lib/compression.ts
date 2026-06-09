@@ -1,10 +1,14 @@
-import brotliPromise, { type BrotliWasmType } from 'brotli-wasm';
+import { type BrotliWasmType } from 'brotli-wasm';
 
 let brotli: BrotliWasmType | null = null;
 
 /** Initialise the WASM module (idempotent — safe to call many times). */
 async function init(): Promise<BrotliWasmType> {
   if (!brotli) {
+    // Lazy-load the ~1 MB Brotli WASM only when compression is first needed
+    // (creating/saving or opening a tree) — keeps it off the initial paint /
+    // landing critical path, so the passphrase screen stays lean and fast.
+    const { default: brotliPromise } = await import('brotli-wasm');
     brotli = await brotliPromise;
   }
   return brotli;

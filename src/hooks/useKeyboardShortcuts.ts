@@ -8,7 +8,7 @@ interface ShortcutOptions {
 
 /**
  * Global keyboard shortcuts:
- * - Escape: close panels / clear search
+ * - Escape: close details modal → deselect member → blur search
  * - Delete/Backspace: delete selected member (triggers confirm)
  * - Ctrl/⌘ + Z: undo
  * - Ctrl/⌘ + Shift + Z / Ctrl/⌘ + Y: redo
@@ -18,12 +18,10 @@ export function useKeyboardShortcuts({
   searchInputRef,
   onDeleteSelected,
 }: ShortcutOptions) {
-  const setEditing = useTreeStore((s) => s.setEditing);
-  const setAddingFor = useTreeStore((s) => s.setAddingFor);
-  const selectMember = useTreeStore((s) => s.selectMember);
+  const detailsForId = useTreeStore((s) => s.detailsForId);
+  const openDetails = useTreeStore((s) => s.openDetails);
   const selectedMemberId = useTreeStore((s) => s.selectedMemberId);
-  const isEditing = useTreeStore((s) => s.isEditing);
-  const addingFor = useTreeStore((s) => s.addingForMemberId);
+  const selectMember = useTreeStore((s) => s.selectMember);
   const undo = useTreeStore((s) => s.undo);
   const redo = useTreeStore((s) => s.redo);
 
@@ -37,15 +35,22 @@ export function useKeyboardShortcuts({
         target.isContentEditable;
 
       const mod = e.metaKey || e.ctrlKey;
+      // Normalize letter keys: with Shift held, KeyboardEvent.key is uppercase
+      // (e.g. 'Z'), so compare case-insensitively or the Shift-based shortcuts
+      // (⌘⇧Z redo) never match.
+      const key = e.key.toLowerCase();
 
-      // Escape — close panels
+      // Escape — close details modal → deselect node → blur search
       if (e.key === 'Escape') {
-        if (addingFor) {
-          setAddingFor(null);
-        } else if (isEditing) {
-          setEditing(false);
+        if (detailsForId) {
+          openDetails(null);
+          return;
+        }
+        if (selectedMemberId) {
           selectMember(null);
-        } else if (
+          return;
+        }
+        if (
           searchInputRef.current &&
           document.activeElement === searchInputRef.current
         ) {
@@ -58,21 +63,21 @@ export function useKeyboardShortcuts({
       if (isInput) return;
 
       // Ctrl+Z — undo
-      if (mod && !e.shiftKey && e.key === 'z') {
+      if (mod && !e.shiftKey && key === 'z') {
         e.preventDefault();
         undo();
         return;
       }
 
       // Ctrl+Shift+Z or Ctrl+Y — redo
-      if ((mod && e.shiftKey && e.key === 'z') || (mod && e.key === 'y')) {
+      if ((mod && e.shiftKey && key === 'z') || (mod && key === 'y')) {
         e.preventDefault();
         redo();
         return;
       }
 
       // Ctrl+K or / — focus search
-      if ((mod && e.key === 'k') || e.key === '/') {
+      if ((mod && key === 'k') || e.key === '/') {
         e.preventDefault();
         searchInputRef.current?.focus();
         return;
@@ -86,11 +91,9 @@ export function useKeyboardShortcuts({
       }
     },
     [
-      addingFor,
-      isEditing,
+      detailsForId,
+      openDetails,
       selectedMemberId,
-      setAddingFor,
-      setEditing,
       selectMember,
       undo,
       redo,

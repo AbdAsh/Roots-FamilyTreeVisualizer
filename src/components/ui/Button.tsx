@@ -21,18 +21,18 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    'bg-amber text-charcoal hover:bg-amber-light active:bg-amber-dark font-semibold',
+    'bg-amber text-charcoal-light hover:bg-amber-dark active:bg-amber-dark font-semibold',
   secondary:
-    'bg-charcoal-lighter text-cream border border-charcoal-lighter hover:border-amber/40 hover:text-amber-light',
-  ghost: 'bg-transparent text-cream/70 hover:text-cream hover:bg-cream/5',
+    'bg-transparent text-cream border border-charcoal-lighter hover:border-amber/60 hover:text-amber',
+  ghost: 'bg-transparent text-cream-dark hover:text-cream hover:bg-cream/5',
   danger:
-    'bg-error/10 text-error border border-error/20 hover:bg-error/20 hover:border-error/40',
+    'bg-transparent text-error border border-error/30 hover:bg-error/10 hover:border-error/60',
 };
 
 const sizeClasses: Record<Size, string> = {
   sm: 'px-3 py-1.5 text-xs rounded-md',
-  md: 'px-4 py-2 text-sm rounded-lg',
-  lg: 'px-6 py-3 text-base rounded-lg',
+  md: 'px-4 py-2 text-sm rounded-md',
+  lg: 'px-6 py-3 text-base rounded-md',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

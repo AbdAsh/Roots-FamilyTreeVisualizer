@@ -33,33 +33,27 @@ export function ConfirmModal({
   }, [onConfirm, onClose]);
 
   const iconColor = variant === 'danger' ? 'text-error' : 'text-amber';
-  const iconBg =
-    variant === 'danger'
-      ? 'bg-error/10 border-error/20'
-      : 'bg-amber/10 border-amber/20';
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="flex flex-col items-center text-center gap-4">
+    <Modal isOpen={isOpen} onClose={onClose} role="alertdialog" label={title}>
+      <div className="flex flex-col items-center text-center gap-4 pt-2">
         {/* Icon */}
-        <div
-          className={`w-12 h-12 rounded-xl border flex items-center justify-center ${iconBg}`}
-        >
-          <AlertTriangle size={22} className={iconColor} />
+        <div className="w-11 h-11 rounded-full border border-charcoal-lighter flex items-center justify-center">
+          <AlertTriangle size={20} className={iconColor} />
         </div>
 
         {/* Title */}
-        <h3 className="font-display text-lg text-cream font-semibold">
+        <h3 className="font-display text-xl font-medium text-cream tracking-tight">
           {title}
         </h3>
 
         {/* Message */}
-        <p className="text-sm text-cream/50 leading-relaxed max-w-xs whitespace-pre-line text-left">
+        <p className="text-sm text-cream-dark leading-relaxed max-w-xs whitespace-pre-line text-start">
           {message}
         </p>
 
         {/* Actions */}
-        <div className="flex gap-3 w-full mt-2">
+        <div className="flex gap-3 w-full mt-3">
           <Button
             variant="ghost"
             size="md"

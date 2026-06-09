@@ -26,11 +26,12 @@
     "deploy": "npm run build && wrangler pages deploy",
     "dev": "vite",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "brotli-wasm": "^3.0.1",
-    "d3": "^7.9.0",
     "framer-motion": "^12.34.3",
     "lucide-react": "^0.575.0",
     "nanoid": "^5.1.6",
@@ -41,12 +42,12 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",
-    "@types/d3": "^7.4.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^3.2.6"
   }
 }

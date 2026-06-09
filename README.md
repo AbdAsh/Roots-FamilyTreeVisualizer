@@ -32,7 +32,7 @@
 - **End-to-end encrypted** — AES-256-GCM via the Web Crypto API; PBKDF2 with 600k iterations
 - **URL-as-database** — the entire family tree is Brotli-compressed, encrypted, and stored in the URL hash
 - **Share by link** — give someone the URL + passphrase and they can view & edit the tree
-- **Interactive tree visualization** — Buchheim-Reingold-Tilford layout algorithm with couple containers, pan/zoom, smooth animations
+- **Interactive tree visualization** — union-aware layered layout: derives unions/couples from relationships, assigns generations, lays out each connected component with a contour packing, and draws cross-links (cycles, extra parents) as reference edges; pan/zoom, smooth animations
 - **Relationship types** — parent-child, spouse, and sibling relationships with auto-inferred suggestions
 - **Multilingual** — English, Arabic (RTL), and Turkish
 - **Export/Import** — JSON, PNG, and SVG export; JSON import
@@ -69,30 +69,36 @@ Encrypted bytes have maximum entropy and don't compress well. By compressing the
 
 ### Layout Algorithm
 
-The tree visualization uses the **Buchheim-Reingold-Tilford** algorithm — an O(n) tree layout via contour comparison:
+The tree visualization uses a **union-aware layered layout** implemented in pure TypeScript (`src/lib/layout/`):
 
-1. **BFS from root** assigns generation tiers (0 = root, negative = ancestors, positive = descendants)
-2. **Couple containers** merge spouse pairs into single layout units
-3. **First walk** (post-order) assigns preliminary x-positions via contour comparison (`apportion`)
-4. **Second walk** (pre-order) accumulates modifiers for final x-coordinates
-5. **Third walk** shifts everything to non-negative x
+1. **Build unions** (`unions.ts`) — derives unions from `relationships`: co-parents who share ≥1 child form a union; childless spouse pairs form a union with no children; a person may belong to multiple unions (remarriage, co-parenting); single and unmarried co-parents are handled naturally.
+2. **Tier assignment** (`tiers.ts`) — longest-path layering over a spanning DAG; both partners of a union share a tier; cycle edges are excluded from tiering and emitted as reference links instead of breaking the layout.
+3. **Connected components** (`components.ts`) — partitions the layout graph so disconnected branches still render, packed side-by-side with a clear gap.
+4. **Per-component layout** (`layout.ts`) — a Buchheim–Reingold–Tilford contour pass over an alternating person/union tree: union nodes are virtual couple anchors; partners straddle the union centre; children are centred underneath. Components are then packed left-to-right and the whole layout is centred.
+5. **Reference links** — cycle edges and extra-parent edges (a child's parents beyond its positioning union) are marked `kind: 'reference'` so the renderer can draw them distinctly without affecting positions.
 
-**Guarantees:** parents centered over children, subtrees never overlap, identical subtrees drawn identically, middle siblings evenly spaced.
+**Handles:** multiple marriages / half-siblings (grouped per union), single parents, unmarried co-parents, both-sided ancestors, disconnected branches, cycles (drawn as reference links), and adoption (>2 parents). Covered by a Vitest fixture suite (24 tests, `npm test`).
 
 ## Tech Stack
 
-| Layer       | Technology                                 |
-| ----------- | ------------------------------------------ |
-| Framework   | React 19                                   |
-| Language    | TypeScript (strict)                        |
-| State       | Zustand                                    |
-| Layout math | D3 (hierarchy only — no D3 selections/DOM) |
-| Animation   | Framer Motion                              |
-| Styling     | Tailwind CSS v4                            |
-| Build       | Vite 7                                     |
-| Validation  | Zod                                        |
-| Compression | Brotli (WASM)                              |
-| Encryption  | Web Crypto API                             |
+| Layer       | Technology                                      |
+| ----------- | ----------------------------------------------- |
+| Framework   | React 19                                        |
+| Language    | TypeScript (strict)                             |
+| State       | Zustand                                         |
+| Layout math | Pure TypeScript (union-aware layered engine)    |
+| Animation   | Framer Motion                                   |
+| Styling     | Tailwind CSS v4                                 |
+| Theming     | Light/dark via CSS custom properties (OKLCH)    |
+| Build       | Vite 7                                          |
+| Validation  | Zod                                             |
+| Testing     | Vitest                                          |
+| Compression | Brotli (WASM)                                   |
+| Encryption  | Web Crypto API                                  |
+
+## Design
+
+Roots uses an **editorial-paper aesthetic** — Spectral (serif) for headings, Hanken Grotesk for body text, and a green-monochrome OKLCH palette with a dark forest-green default. A light/dark theme toggle is available in the header and persists across sessions via `localStorage`.
 
 ## Getting Started
 
@@ -116,6 +122,7 @@ npm run dev          # Start Vite dev server (http://localhost:5173)
 npm run build        # Production build with TypeScript checking
 npm run preview      # Preview the production build locally
 npm run typecheck    # Run TypeScript compiler without emitting
+npm test             # Run Vitest layout fixture suite
 ```
 
 ## Project Structure
@@ -123,12 +130,15 @@ npm run typecheck    # Run TypeScript compiler without emitting
 ```
 src/
 ├── app/
-│   └── App.tsx              # Root component — header, tree, panels
+│   └── App.tsx              # Root component — header, canvas, modals
 ├── components/
-│   ├── editor/              # Edit panel, add-relative modal/form
+│   ├── editor/              # DetailsModal + MemberForm (in-canvas editing)
 │   ├── tree/
-│   │   └── FamilyTreeView.tsx  # SVG tree renderer (pan/zoom/interactions)
-│   └── ui/                  # Reusable UI primitives (Button, Modal, Panel, etc.)
+│   │   ├── FamilyTreeView.tsx  # SVG canvas renderer (pan/zoom/interactions)
+│   │   ├── NodeCard.tsx        # Expand-to-card node with inline add form
+│   │   ├── AddAffordances.tsx  # +parent / +child / +spouse / +sibling buttons
+│   │   └── EdgeLayer.tsx       # Primary + reference link rendering
+│   └── ui/                  # Reusable UI primitives (Button, Modal, etc.)
 ├── hooks/
 │   ├── useAuth.ts           # Passphrase auth (Zustand store)
 │   ├── useKeyboardShortcuts.ts
@@ -138,12 +148,17 @@ src/
 │   ├── compression.ts       # Brotli WASM compress/decompress
 │   ├── crypto.ts            # AES-256-GCM encrypt/decrypt via Web Crypto
 │   ├── i18n.tsx             # Translations (en, ar, tr) + context
+│   ├── layout/              # Union-aware layout engine + Vitest fixtures
+│   │   ├── unions.ts        #   Derive unions from relationships
+│   │   ├── tiers.ts         #   Longest-path tier assignment + cycle detection
+│   │   ├── components.ts    #   Connected-component partitioning
+│   │   └── layout.ts        #   BRT contour pass + component packing
 │   ├── passphrase.ts        # Strength scoring + brute-force throttle
-│   ├── tree-utils.ts        # Buchheim-Reingold-Tilford layout + helpers
+│   ├── tree-utils.ts        # Relationship queries + layout entry (delegates to lib/layout)
 │   ├── url.ts               # Save/load pipeline (JSON ↔ compress ↔ encrypt ↔ hash)
 │   └── validation.ts        # Zod schemas for all data types
 ├── styles/
-│   └── globals.css          # Tailwind v4 theme + custom properties
+│   └── globals.css          # Tailwind v4 theme + OKLCH custom properties
 └── types/
     └── family.ts            # Core data types (FamilyMember, Relationship, FamilyTree)
 ```

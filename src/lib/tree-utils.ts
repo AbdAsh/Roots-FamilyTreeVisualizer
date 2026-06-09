@@ -2,146 +2,27 @@
  * Tree layout engine and graph query helpers.
  *
  * This module contains:
- * - **`computeTieredLayout()`** — the core layout algorithm (Buchheim-Reingold-Tilford
- *   with couple containers). Produces pixel coordinates for rendering.
- * - **`toD3Hierarchy()`** — converts a flat `FamilyTree` to a D3-compatible hierarchy
- *   (used for legacy compatibility; the tiered layout is the primary renderer).
+ * - **`computeTieredLayout()`** — the public layout entry point. It orchestrates
+ *   the union-aware layered engine in `src/lib/layout/` (unions → tiers →
+ *   components → per-component founder-based descendant layout → packing) and
+ *   emits pixel coordinates plus `primary`/`reference` links for the renderer.
  * - **Graph query helpers** — `getParents()`, `getChildren()`, `getSpouse()`, `getSiblings()`,
  *   `getRelationshipsForMember()`.
  * - **`getInferredRelationships()`** — auto-suggests additional relationships when adding
  *   a new relative (e.g. sibling links to existing children).
  *
- * ### Layout Algorithm Overview
- *
- * `computeTieredLayout()` implements Buchheim-Reingold-Tilford (O(n)):
- * 1. BFS from `rootMemberId` assigns generation tiers (0 = root, negative = ancestors, positive = descendants)
- * 2. Spouse pairs are merged into single "couple container" units
- * 3. `firstWalk` (post-order) assigns preliminary x via contour comparison (`apportion`)
- * 4. `secondWalk` (pre-order) accumulates `mod` for final x
- * 5. `thirdWalk` shifts for non-negative x; positions scaled to pixels
- *
- * **Guarantees:** parents centred over children, subtrees never overlap,
- * identical subtrees drawn identically, middle siblings evenly spaced.
- *
  * @module tree-utils
  */
-import * as d3 from 'd3';
 import type {
   FamilyTree,
   FamilyMember,
   Relationship,
   RelationshipType,
 } from '@/types/family';
-
-/** Node in the D3 hierarchy */
-export interface TreeNode {
-  id: string;
-  member: FamilyMember;
-  children?: TreeNode[];
-  spouse?: FamilyMember;
-  /** How this node connects to its parent in the hierarchy (for link styling). */
-  linkType?: 'parent-child' | 'child-parent' | 'sibling';
-}
-
-/**
- * Convert a flat FamilyTree into a D3-compatible hierarchy rooted at rootMemberId.
- *
- * Walks ALL relationship types bidirectionally so every connected member
- * (children, parents-of-root, siblings, spouses) appears in the tree.
- * Each child node carries a `linkType` so the renderer can style the edge.
- */
-export function toD3Hierarchy(tree: FamilyTree): d3.HierarchyNode<TreeNode> {
-  const memberMap = new Map(tree.members.map((m) => [m.id, m]));
-
-  // Bidirectional adjacency across ALL relationship types
-  type Edge = { targetId: string; relType: RelationshipType; isFrom: boolean };
-  const adj = new Map<string, Edge[]>();
-
-  for (const rel of tree.relationships) {
-    const fe = adj.get(rel.from) ?? [];
-    fe.push({ targetId: rel.to, relType: rel.type, isFrom: true });
-    adj.set(rel.from, fe);
-
-    const te = adj.get(rel.to) ?? [];
-    te.push({ targetId: rel.from, relType: rel.type, isFrom: false });
-    adj.set(rel.to, te);
-  }
-
-  function buildNode(memberId: string, visited: Set<string>): TreeNode | null {
-    if (visited.has(memberId)) return null;
-    visited.add(memberId);
-
-    const member = memberMap.get(memberId);
-    if (!member) return null;
-
-    const treeChildren: TreeNode[] = [];
-    let spouse: FamilyMember | undefined;
-    const edges = adj.get(memberId) ?? [];
-
-    // First pass — claim one spouse (mark visited early)
-    for (const edge of edges) {
-      if (visited.has(edge.targetId)) continue;
-      if (edge.relType === 'spouse' && !spouse) {
-        const sm = memberMap.get(edge.targetId);
-        if (sm) {
-          spouse = sm;
-          visited.add(edge.targetId);
-        }
-      }
-    }
-
-    // Second pass — build child nodes from all non-spouse edges
-    for (const edge of edges) {
-      if (visited.has(edge.targetId) || edge.relType === 'spouse') continue;
-      const child = buildNode(edge.targetId, visited);
-      if (child) {
-        if (edge.relType === 'parent-child') {
-          // isFrom = current node is "from" (parent) → target is a child
-          child.linkType = edge.isFrom ? 'parent-child' : 'child-parent';
-        } else {
-          child.linkType = 'sibling';
-        }
-        treeChildren.push(child);
-      }
-    }
-
-    // Third pass — walk the spouse's edges so their relatives appear too
-    if (spouse) {
-      const spouseEdges = adj.get(spouse.id) ?? [];
-      for (const se of spouseEdges) {
-        if (visited.has(se.targetId) || se.relType === 'spouse') continue;
-        const child = buildNode(se.targetId, visited);
-        if (child) {
-          if (se.relType === 'parent-child') {
-            child.linkType = se.isFrom ? 'parent-child' : 'child-parent';
-          } else {
-            child.linkType = 'sibling';
-          }
-          treeChildren.push(child);
-        }
-      }
-    }
-
-    return {
-      id: member.id,
-      member,
-      children: treeChildren.length > 0 ? treeChildren : undefined,
-      spouse,
-    };
-  }
-
-  const rootNode = buildNode(tree.rootMemberId, new Set()) ?? {
-    id: tree.rootMemberId,
-    member: memberMap.get(tree.rootMemberId) ?? {
-      id: tree.rootMemberId,
-      name: 'Unknown',
-      gender: 'unknown' as const,
-      customFields: {},
-    },
-  };
-
-  return d3.hierarchy(rootNode, (d) => d.children);
-}
+import { buildUnions } from '@/lib/layout/unions';
+import { assignTiers } from '@/lib/layout/tiers';
+import { connectedComponents } from '@/lib/layout/components';
+import { computeUnionLayout, COL_GAP, TIER_GAP } from '@/lib/layout/layout';
 
 /**
  * Get all relationships for a specific member.
@@ -313,9 +194,19 @@ export function getInferredRelationships(
   }
 
   if (relType === 'parent') {
-    // Existing siblings should probably also be children of the new parent
+    // Existing siblings should probably also be children of the new parent —
+    // but only FULL siblings (those sharing the member's exact set of known
+    // parents). A half-sibling shares just one parent via a *different* other
+    // parent, so auto-assigning the new parent to them would wrongly
+    // over-connect blended families. (The chip still lets the user add others.)
+    const memberParentIds = new Set(getParents(memberId, tree).map((p) => p.id));
     const siblings = getSiblings(memberId, tree);
     for (const sib of siblings) {
+      const sibParentIds = new Set(getParents(sib.id, tree).map((p) => p.id));
+      const sameParents =
+        sibParentIds.size === memberParentIds.size &&
+        [...memberParentIds].every((id) => sibParentIds.has(id));
+      if (!sameParents) continue;
       suggestions.push({
         key: `also-parent-of-${sib.id}`,
         label: `Also parent of ${sib.name}`,
@@ -382,6 +273,14 @@ export interface PositionedLink {
   target: { x: number; y: number };
   mid: { x: number; y: number };
   type: 'parent-child' | 'sibling' | 'spouse';
+  /**
+   * Whether this edge participates in positioning (`'primary'`) or is an
+   * auxiliary edge the layout could not satisfy structurally — a cycle edge
+   * (cousin marriage) or an extra-parent edge beyond a child's positioning
+   * union (adoption / >2 parents). Reference links are drawn distinctly and
+   * never affect node positions. Defaults to `'primary'`.
+   */
+  kind: 'primary' | 'reference';
 }
 
 export interface TieredLayout {
@@ -389,387 +288,94 @@ export interface TieredLayout {
   links: PositionedLink[];
 }
 
-const TIER_GAP = 180;
-const COL_GAP = 200;
-const SPOUSE_OFFSET = 120;
-
-/* ═══════ Buchheim–Reingold–Tilford with couple containers ═══════
- *
- * The layout tree is built from parent-child edges ONLY.
- * Spouse pairs are merged into single "couple container" nodes whose
- * width accounts for the extra space.  Sibling edges are purely visual
- * and never affect the tree hierarchy — siblings appear as co-children
- * of the same parent unit, which Buchheim handles natively.
- *
- * Guarantees:
- *   • parents centred over children
- *   • subtrees never overlap (contour comparison)
- *   • identical subtrees drawn identically
- *   • middle siblings evenly spaced
- */
-
-interface BNode {
-  id: string;
-  spouseIds: string[];
-  children: BNode[];
-  parent: BNode | null;
-  tier: number;
-  /** How many extra "unit widths" this node occupies to the right (for spouses). */
-  size: number;
-  x: number;
-  mod: number;
-  thread: BNode | null;
-  ancestor: BNode;
-  change: number;
-  shift: number;
-  number: number;
-}
-
-/* ── Buchheim primitives ── */
-
-function leftBro(v: BNode): BNode | null {
-  if (!v.parent) return null;
-  const sibs = v.parent.children;
-  for (let i = 1; i < sibs.length; i++) {
-    if (sibs[i] === v) return sibs[i - 1];
-  }
-  return null;
-}
-
-function leftmostSib(v: BNode): BNode | null {
-  if (!v.parent || v === v.parent.children[0]) return null;
-  return v.parent.children[0];
-}
-
-function nLeft(v: BNode): BNode | null {
-  return v.children.length > 0 ? v.children[0] : v.thread;
-}
-
-function nRight(v: BNode): BNode | null {
-  return v.children.length > 0 ? v.children[v.children.length - 1] : v.thread;
-}
-
-/** Minimum separation between two adjacent sibling nodes (in layout units). */
-function sep(left: BNode, _right: BNode): number {
-  // 1 base unit + extra for the left node's spouse width
-  return 1 + left.size;
-}
-
-function moveSub(wl: BNode, wr: BNode, sh: number) {
-  const n = wr.number - wl.number;
-  if (n > 0) {
-    wr.change -= sh / n;
-    wr.shift += sh;
-    wl.change += sh / n;
-  }
-  wr.x += sh;
-  wr.mod += sh;
-}
-
-function execShifts(v: BNode) {
-  let s = 0,
-    c = 0;
-  for (let i = v.children.length - 1; i >= 0; i--) {
-    const w = v.children[i];
-    w.x += s;
-    w.mod += s;
-    c += w.change;
-    s += w.shift + c;
-  }
-}
-
-function findAnc(vil: BNode, v: BNode, da: BNode): BNode {
-  return v.parent && v.parent.children.includes(vil.ancestor)
-    ? vil.ancestor
-    : da;
-}
-
-function apportion(v: BNode, da: BNode): BNode {
-  const w = leftBro(v);
-  if (!w) return da;
-
-  let vir: BNode = v,
-    vor: BNode = v,
-    vil: BNode = w;
-  let vol: BNode = leftmostSib(v) ?? v;
-  let sir = vir.mod,
-    sor = vor.mod,
-    sil = vil.mod,
-    sol = vol.mod;
-
-  let nr = nRight(vil),
-    nl = nLeft(vir);
-  while (nr && nl) {
-    vil = nr;
-    vir = nl;
-    const nlv = nLeft(vol);
-    const nrv = nRight(vor);
-    if (!nlv || !nrv) break;
-    vol = nlv;
-    vor = nrv;
-    vor.ancestor = v;
-
-    const shift = vil.x + sil - (vir.x + sir) + sep(vil, vir);
-    if (shift > 0) {
-      moveSub(findAnc(vil, v, da), v, shift);
-      sir += shift;
-      sor += shift;
-    }
-
-    sil += vil.mod;
-    sir += vir.mod;
-    sol += vol.mod;
-    sor += vor.mod;
-    nr = nRight(vil);
-    nl = nLeft(vir);
-  }
-
-  if (nr && !nRight(vor)) {
-    vor.thread = nr;
-    vor.mod += sil - sor;
-  }
-  if (nl && !nLeft(vol)) {
-    vol.thread = nl;
-    vol.mod += sir - sol;
-  }
-  return v;
-}
-
-function firstWalk(v: BNode) {
-  if (v.children.length === 0) {
-    const lb = leftBro(v);
-    v.x = lb ? lb.x + sep(lb, v) : 0;
-  } else {
-    let da = v.children[0];
-    for (const c of v.children) {
-      firstWalk(c);
-      da = apportion(c, da);
-    }
-    execShifts(v);
-    const mid = (v.children[0].x + v.children[v.children.length - 1].x) / 2;
-    const lb = leftBro(v);
-    if (lb) {
-      v.x = lb.x + sep(lb, v);
-      v.mod = v.x - mid;
-    } else {
-      v.x = mid;
-    }
-  }
-}
-
-function secondWalk(v: BNode, m: number): number {
-  v.x += m;
-  let min = v.x;
-  for (const c of v.children) min = Math.min(min, secondWalk(c, m + v.mod));
-  return min;
-}
-
-function thirdWalk(v: BNode, n: number) {
-  v.x += n;
-  for (const c of v.children) thirdWalk(c, n);
-}
-
-/* ═══════ Main layout function ═══════ */
 
 /**
- * Compute pixel positions for every member in the family tree using the
- * Buchheim-Reingold-Tilford algorithm with couple-container extensions.
+ * Last-resort layout for a component whose union-aware pass threw (only deep
+ * pathological input). Places members on their tier rows in member order — no
+ * overlap, monotonic tiers, just not aesthetically optimal.
+ */
+function gridFallback(
+  component: Set<string>,
+  tierOf: Map<string, number>,
+): Map<string, { x: number; y: number }> {
+  const byTier = new Map<number, string[]>();
+  for (const id of component) {
+    const t = tierOf.get(id) ?? 0;
+    const arr = byTier.get(t) ?? [];
+    arr.push(id);
+    byTier.set(t, arr);
+  }
+  const pos = new Map<string, { x: number; y: number }>();
+  for (const [t, ids] of byTier) {
+    ids.forEach((id, i) => pos.set(id, { x: i * COL_GAP, y: t * TIER_GAP }));
+  }
+  return pos;
+}
+
+/* ═══════ Union-aware layered layout orchestrator ═══════ */
+
+/**
+ * Compute pixel positions for every member in the family tree.
+ *
+ * Pipeline (see `src/lib/layout/`):
+ *   1. `buildUnions` — derive co-parent / spouse unions from edges.
+ *   2. `assignTiers` — union-find generations + longest-path layering;
+ *      cycle edges are returned as `referenceEdges`.
+ *   3. `connectedComponents` — partition so unreachable clusters still render.
+ *   4. `computeUnionLayout` — per component: find genealogical founders (tops),
+ *      lay each founder's lineage out downward with a Buchheim contour pass over
+ *      an alternating person/union node tree, pack the founder trees, then
+ *      re-centre each union's children under its couple midpoint.
+ *   5. Pack components left-to-right with a clear gap; centre around x = 0.
+ *   6. Emit `nodes` + `links`; mark cycle/extra-parent edges `kind:'reference'`.
  *
  * @param tree - The family tree to lay out.
- * @returns A {@link TieredLayout} with `positions` (Map of member ID → `{x, y, tier}`),
- *   `tierMap` (Map of member ID → tier number), and `spouseMap` (Map of member ID → spouse ID).
- *   Returns `null` if the tree is empty.
+ * @returns A {@link TieredLayout}, or `null` if the tree has no members.
  */
 export function computeTieredLayout(tree: FamilyTree): TieredLayout | null {
   if (!tree || tree.members.length === 0) return null;
 
-  const memberMap = new Map(tree.members.map((m) => [m.id, m]));
+  const memberOrder = new Map(tree.members.map((m, i) => [m.id, i]));
 
-  /* ── Adjacency list ── */
-  type Edge = { targetId: string; relType: RelationshipType; isFrom: boolean };
-  const adj = new Map<string, Edge[]>();
-  for (const rel of tree.relationships) {
-    const fe = adj.get(rel.from) ?? [];
-    fe.push({ targetId: rel.to, relType: rel.type, isFrom: true });
-    adj.set(rel.from, fe);
-    const te = adj.get(rel.to) ?? [];
-    te.push({ targetId: rel.from, relType: rel.type, isFrom: false });
-    adj.set(rel.to, te);
-  }
+  const unions = buildUnions(tree);
+  const { tierOf, referenceEdges } = assignTiers(tree, unions);
+  const components = connectedComponents(tree);
 
-  /* ── Phase 1 BFS: parent-child + spouse edges ──
-   * Assigns tiers and builds the layout tree from parent-child edges ONLY.
-   * Spouse pairs are tracked but don't create tree edges.
-   */
-  const tierOf = new Map<string, number>();
-  const spousePairs = new Map<string, string[]>();
-  const layoutChildren = new Map<string, string[]>();
-  const visited = new Set<string>();
-  const queue: { id: string; tier: number }[] = [];
-
-  visited.add(tree.rootMemberId);
-  tierOf.set(tree.rootMemberId, 0);
-  queue.push({ id: tree.rootMemberId, tier: 0 });
-
-  while (queue.length > 0) {
-    const { id, tier } = queue.shift()!;
-    // Sort edges: parent-child first, then spouse, then sibling
-    const edges = [...(adj.get(id) ?? [])].sort((a, b) => {
-      const p: Record<string, number> = {
-        'parent-child': 0,
-        spouse: 1,
-        sibling: 2,
-      };
-      return (p[a.relType] ?? 3) - (p[b.relType] ?? 3);
-    });
-
-    for (const edge of edges) {
-      if (visited.has(edge.targetId)) continue;
-
-      let nextTier: number;
-      if (edge.relType === 'spouse') {
-        nextTier = tier;
-        const existing = spousePairs.get(id) ?? [];
-        existing.push(edge.targetId);
-        spousePairs.set(id, existing);
-      } else if (edge.relType === 'parent-child') {
-        nextTier = edge.isFrom ? tier + 1 : tier - 1;
-      } else {
-        // Sibling: same tier
-        nextTier = tier;
-      }
-
-      visited.add(edge.targetId);
-      tierOf.set(edge.targetId, nextTier);
-
-      // ONLY parent-child edges form the layout tree hierarchy
-      if (edge.relType === 'parent-child') {
-        const ch = layoutChildren.get(id) ?? [];
-        ch.push(edge.targetId);
-        layoutChildren.set(id, ch);
-      }
-
-      queue.push({ id: edge.targetId, tier: nextTier });
-    }
-  }
-
-  const secondarySet = new Set([...spousePairs.values()].flat());
-
-  /* ── Build the Buchheim layout tree ── */
-
-  // Collect all nodes that are part of the layout tree (reachable via parent-child)
-  const inLayoutTree = new Set<string>();
-  function markInTree(id: string) {
-    inLayoutTree.add(id);
-    for (const cid of layoutChildren.get(id) ?? []) {
-      if (!secondarySet.has(cid)) markInTree(cid);
-    }
-    // Spouses are part of the layout tree via their primary
-    for (const sp of spousePairs.get(id) ?? []) inLayoutTree.add(sp);
-  }
-  markInTree(tree.rootMemberId);
-
-  function buildTree(id: string, parent: BNode | null, num: number): BNode {
-    const spList = spousePairs.get(id) ?? [];
-    const node: BNode = {
-      id,
-      spouseIds: spList,
-      children: [],
-      parent,
-      tier: tierOf.get(id) ?? 0,
-      size: spList.length * (SPOUSE_OFFSET / COL_GAP),
-      x: 0,
-      mod: 0,
-      thread: null,
-      ancestor: null!,
-      change: 0,
-      shift: 0,
-      number: num,
-    };
-    node.ancestor = node;
-
-    // Layout children = direct parent-child children of this node + all spouses'
-    // parent-child children, excluding secondary spouses.
-    const childIds = [...(layoutChildren.get(id) ?? [])];
-    for (const sp of spList) {
-      childIds.push(...(layoutChildren.get(sp) ?? []));
-    }
-
-    node.children = childIds
-      .filter((cid) => !secondarySet.has(cid))
-      .map((cid, i) => buildTree(cid, node, i + 1));
-
-    return node;
-  }
-
-  const layoutRoot = buildTree(tree.rootMemberId, null, 1);
-
-  /* ── Run Buchheim ── */
-  firstWalk(layoutRoot);
-  const minX = secondWalk(layoutRoot, 0);
-  if (minX < 0) thirdWalk(layoutRoot, -minX);
-
-  /* ── Extract pixel positions ── */
+  /* ── Lay out each component, then pack left-to-right ── */
   const pos = new Map<string, { x: number; y: number }>();
+  let packOffset = 0; // running x-offset for the next component
 
-  function extractPositions(v: BNode) {
-    const px = v.x * COL_GAP;
-    const py = v.tier * TIER_GAP;
-    pos.set(v.id, { x: px, y: py });
-    for (let i = 0; i < v.spouseIds.length; i++) {
-      const sid = v.spouseIds[i];
-      if (tierOf.has(sid)) {
-        pos.set(sid, { x: px + SPOUSE_OFFSET * (i + 1), y: py });
-      }
+  for (const component of components) {
+    let local: Map<string, { x: number; y: number }>;
+    try {
+      local = computeUnionLayout(tree, component, unions, tierOf);
+    } catch (err) {
+      // Degrade gracefully instead of crashing the canvas. The recursive
+      // Buchheim walk can overflow the stack on a pathological lineage (e.g. a
+      // multi-thousand-deep chain from a tampered/hand-crafted URL hash — real
+      // trees can't reach this under the 8 KB hash budget). Fall back to a
+      // simple tier grid for just this component so everything else still
+      // renders. The ErrorBoundary is the outer net for anything else.
+      console.error('[layout] component layout failed; using grid fallback:', err);
+      local = gridFallback(component, tierOf);
     }
-    for (const c of v.children) extractPositions(c);
-  }
-  extractPositions(layoutRoot);
+    if (local.size === 0) continue;
 
-  /* ── Place orphan nodes ──
-   * Nodes reachable only via sibling edges (not in the layout tree).
-   * Place each orphan adjacent to its connected peer on the same tier.
-   */
-  for (const [mid] of tierOf) {
-    if (pos.has(mid)) continue; // already positioned
-    const myTier = tierOf.get(mid)!;
-    const py = myTier * TIER_GAP;
-
-    // Find a positioned peer on the same tier via sibling edge
-    let anchorX = 0;
-    let foundAnchor = false;
-    for (const edge of adj.get(mid) ?? []) {
-      if (edge.relType === 'sibling' || edge.relType === 'spouse') {
-        const peerPos = pos.get(edge.targetId);
-        if (peerPos && tierOf.get(edge.targetId) === myTier) {
-          anchorX = peerPos.x;
-          foundAnchor = true;
-          break;
-        }
-      }
+    let xMin = Infinity;
+    let xMax = -Infinity;
+    for (const p of local.values()) {
+      xMin = Math.min(xMin, p.x);
+      xMax = Math.max(xMax, p.x);
     }
-
-    // Find the rightmost node on this tier to place orphan after it
-    let maxX = foundAnchor ? anchorX : 0;
-    for (const [oid, p] of pos) {
-      if (tierOf.get(oid) === myTier && p.x > maxX) maxX = p.x;
-    }
-    pos.set(mid, { x: maxX + COL_GAP, y: py });
-
-    // Also place this orphan's spouses
-    const spList = spousePairs.get(mid) ?? [];
-    for (let i = 0; i < spList.length; i++) {
-      const sid = spList[i];
-      if (!pos.has(sid) && tierOf.has(sid)) {
-        pos.set(sid, { x: maxX + COL_GAP + SPOUSE_OFFSET * (i + 1), y: py });
-      }
-    }
+    const shift = packOffset - xMin;
+    for (const [id, p] of local) pos.set(id, { x: p.x + shift, y: p.y });
+    packOffset += xMax - xMin + COL_GAP * 2;
   }
 
   /* ── Centre around x = 0 ── */
   if (pos.size > 0) {
-    let xMin = Infinity,
-      xMax = -Infinity;
+    let xMin = Infinity;
+    let xMax = -Infinity;
     for (const p of pos.values()) {
       xMin = Math.min(xMin, p.x);
       xMax = Math.max(xMax, p.x);
@@ -778,21 +384,61 @@ export function computeTieredLayout(tree: FamilyTree): TieredLayout | null {
     for (const p of pos.values()) p.x -= cx;
   }
 
-  /* ── Build output ── */
+  /* ── Nodes ── */
   const nodes: PositionedNode[] = [];
-  for (const [mid, p] of pos) {
-    const member = memberMap.get(mid);
-    if (!member) continue;
+  for (const m of tree.members) {
+    const p = pos.get(m.id);
+    if (!p) continue;
     nodes.push({
-      id: mid,
-      member,
+      id: m.id,
+      member: m,
       x: p.x,
       y: p.y,
-      tier: tierOf.get(mid) ?? 0,
-      isRoot: mid === tree.rootMemberId,
+      tier: tierOf.get(m.id) ?? 0,
+      isRoot: m.id === tree.rootMemberId,
     });
   }
 
+  /* ── Reference-edge determination ──
+   * An edge is `'reference'` when it is a cycle edge (from `assignTiers`) OR an
+   * extra-parent edge: a child with >2 parents has a "positioning pair" (a
+   * spouse couple among its parents, else the first two by member order); any
+   * parent-child edge from a parent outside that pair is a reference link.
+   */
+  const refKeys = new Set(referenceEdges.map((r) => r.id));
+
+  // parents-of map + spouse adjacency for positioning-pair detection
+  const parentsOf = new Map<string, string[]>();
+  for (const r of tree.relationships) {
+    if (r.type !== 'parent-child') continue;
+    const arr = parentsOf.get(r.to) ?? [];
+    if (!arr.includes(r.from)) arr.push(r.from);
+    parentsOf.set(r.to, arr);
+  }
+  const spousePairKey = new Set<string>();
+  for (const r of tree.relationships) {
+    if (r.type !== 'spouse') continue;
+    spousePairKey.add([r.from, r.to].sort().join('|'));
+  }
+
+  /** Parents that position the child (≤2). Extra parents → reference. */
+  const positioningParents = (childId: string): Set<string> => {
+    const ps = (parentsOf.get(childId) ?? [])
+      .slice()
+      .sort((a, b) => (memberOrder.get(a) ?? 0) - (memberOrder.get(b) ?? 0));
+    if (ps.length <= 2) return new Set(ps);
+    // Prefer a spouse couple among the parents.
+    for (let i = 0; i < ps.length; i++) {
+      for (let j = i + 1; j < ps.length; j++) {
+        if (spousePairKey.has([ps[i], ps[j]].sort().join('|'))) {
+          return new Set([ps[i], ps[j]]);
+        }
+      }
+    }
+    return new Set([ps[0], ps[1]]);
+  };
+
+  /* ── Links ── */
   const links: PositionedLink[] = [];
   for (const rel of tree.relationships) {
     const fp = pos.get(rel.from);
@@ -805,6 +451,16 @@ export function computeTieredLayout(tree: FamilyTree): TieredLayout | null {
         : rel.type === 'sibling'
           ? 'sibling'
           : 'parent-child';
+
+    let kind: PositionedLink['kind'] = 'primary';
+    if (refKeys.has(rel.id)) {
+      kind = 'reference';
+    } else if (rel.type === 'parent-child') {
+      const pp = positioningParents(rel.to);
+      if ((parentsOf.get(rel.to)?.length ?? 0) > 2 && !pp.has(rel.from)) {
+        kind = 'reference';
+      }
+    }
 
     const source =
       type === 'parent-child' && fp.y > tp.y ? { ...tp } : { ...fp };
@@ -819,6 +475,7 @@ export function computeTieredLayout(tree: FamilyTree): TieredLayout | null {
       target,
       mid,
       type,
+      kind,
     });
   }
 

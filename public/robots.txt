@@ -3,6 +3,3 @@ Allow: /
 
 # Sitemaps
 Sitemap: https://roots.abdash.net/sitemap.xml
-
-# Host
-Host: roots.abdash.net
