@@ -244,9 +244,16 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
     fitRef.current();
   }, [memberCount]);
 
-  /* ── Pan / Zoom (pointer events) ── */
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
+  /* ── Wheel zoom ──
+     Bound as a NON-passive native listener so preventDefault() actually
+     suppresses the browser's page scroll/zoom. React 19 registers its
+     delegated wheel listener as passive, which makes preventDefault() inside a
+     React onWheel handler a no-op (with a console warning). Re-runs when the
+     canvas appears (layoutData null→set) so the ref is attached. */
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       const d = e.deltaY > 0 ? 0.9 : 1.1;
       transformRef.current.k = Math.min(
@@ -254,10 +261,12 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
         Math.max(0.2, transformRef.current.k * d),
       );
       applyTransform();
-    },
-    [applyTransform],
-  );
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [applyTransform, layoutData]);
 
+  /* ── Pan (pointer events) ── */
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     // Don't pan when interacting with a node card / affordance / empty-state UI.
     if ((e.target as Element).closest('.tree-node')) return;
@@ -315,6 +324,30 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
   );
   // Stable so the memoized NodeCard isn't invalidated every render.
   const requestDelete = useCallback((id: string) => setDeletingId(id), []);
+
+  /* ── Keyboard pan/zoom — the canvas is focusable so keyboard-only users can
+     reach off-screen subtrees that fit/zoom doesn't frame. Only acts when the
+     canvas container itself is focused (not a node card / affordance / input). */
+  const handleCanvasKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.target !== e.currentTarget) return;
+      const PAN = 60;
+      switch (e.key) {
+        case 'ArrowLeft': transformRef.current.x += PAN; break;
+        case 'ArrowRight': transformRef.current.x -= PAN; break;
+        case 'ArrowUp': transformRef.current.y += PAN; break;
+        case 'ArrowDown': transformRef.current.y -= PAN; break;
+        case '+':
+        case '=': transformRef.current.k = Math.min(3, transformRef.current.k * 1.1); break;
+        case '-':
+        case '_': transformRef.current.k = Math.max(0.2, transformRef.current.k * 0.9); break;
+        default: return;
+      }
+      e.preventDefault();
+      applyTransform();
+    },
+    [applyTransform],
+  );
 
   /* ── Empty state (no members and no first-person draft) ── */
   if (!tree) {
@@ -382,7 +415,10 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
     <div
       ref={containerRef}
       className="flex-1 relative overflow-hidden cursor-grab active:cursor-grabbing touch-none"
-      onWheel={handleWheel}
+      role="application"
+      aria-label={strings.app.canvasLabel}
+      tabIndex={0}
+      onKeyDown={handleCanvasKeyDown}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -446,7 +482,8 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
             transformRef.current.k = Math.min(3, transformRef.current.k * 1.2);
             applyTransform();
           }}
-          aria-label="Zoom in"
+          aria-label={strings.app.zoomIn}
+          title={strings.app.zoomIn}
           className="w-9 h-9 touch-target rounded-lg bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
         >
           +
@@ -460,7 +497,8 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
             );
             applyTransform();
           }}
-          aria-label="Zoom out"
+          aria-label={strings.app.zoomOut}
+          title={strings.app.zoomOut}
           className="w-9 h-9 touch-target rounded-lg bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
         >
           −
@@ -468,7 +506,8 @@ export function FamilyTreeView({ searchQuery = '' }: { searchQuery?: string }) {
         <button
           type="button"
           onClick={fitToView}
-          aria-label="Fit to view"
+          aria-label={strings.app.fitToView}
+          title={strings.app.fitToView}
           className="w-9 h-9 touch-target rounded-lg bg-charcoal-light border border-charcoal-lighter text-cream-dark hover:text-cream hover:border-amber flex items-center justify-center text-[10px] font-medium transition-colors cursor-pointer"
         >
           FIT

@@ -193,6 +193,7 @@ export default function App() {
           <Button
             variant="ghost"
             size="sm"
+            className="touch-target"
             onClick={toggleTheme}
             aria-label={strings.app.toggleTheme}
             title={strings.app.toggleTheme}
@@ -261,7 +262,7 @@ export default function App() {
               onClick={() => setMenuOpen((o) => !o)}
               aria-label={strings.app.menu}
               title={strings.app.menu}
-              aria-haspopup="menu"
+              aria-haspopup="true"
               aria-expanded={menuOpen}
             >
               {menuOpen ? <X size={16} /> : <Menu size={16} />}
@@ -270,7 +271,7 @@ export default function App() {
             <AnimatePresence>
               {menuOpen && (
                 <motion.div
-                  role="menu"
+                  aria-label={strings.app.menu}
                   initial={
                     reduceMotion
                       ? { opacity: 0 }

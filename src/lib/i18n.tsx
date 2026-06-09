@@ -65,6 +65,11 @@ export interface Translations {
     toggleTheme: string;
     menu: string;
     close: string;
+    zoomIn: string;
+    zoomOut: string;
+    fitToView: string;
+    privacy: string;
+    canvasLabel: string;
   };
   // Passphrase screen
   auth: {
@@ -210,6 +215,7 @@ export interface Translations {
   hints: {
     addRelatives: string;
     share: string;
+    dismiss: string;
   };
 }
 
@@ -229,6 +235,11 @@ const en: Translations = {
     toggleTheme: 'Toggle theme',
     menu: 'Menu',
     close: 'Close',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    fitToView: 'Fit to view',
+    privacy: 'Privacy',
+    canvasLabel: 'Family tree canvas — use arrow keys to pan',
   },
   auth: {
     plantTree: 'Plant your family tree',
@@ -379,6 +390,7 @@ const en: Translations = {
       'Tap a person, then use + to add parents, a partner, children, or siblings.',
     share:
       'Share copies a link — anyone with it and the passphrase can view and edit.',
+    dismiss: 'Dismiss',
   },
 };
 
@@ -398,6 +410,11 @@ const ar: Translations = {
     toggleTheme: 'تبديل السمة',
     menu: 'القائمة',
     close: 'إغلاق',
+    zoomIn: 'تكبير',
+    zoomOut: 'تصغير',
+    fitToView: 'ملاءمة العرض',
+    privacy: 'الخصوصية',
+    canvasLabel: 'لوحة شجرة العائلة — استخدم مفاتيح الأسهم للتحريك',
   },
   auth: {
     plantTree: 'ازرع شجرة عائلتك',
@@ -546,6 +563,7 @@ const ar: Translations = {
       'اضغط على شخص، ثم استخدم + لإضافة والدين أو شريك أو أبناء أو أشقاء.',
     share:
       'المشاركة تنسخ رابطاً — يستطيع أي شخص يمتلكه مع كلمة المرور العرض والتعديل.',
+    dismiss: 'تجاهل',
   },
 };
 
@@ -565,6 +583,11 @@ const tr: Translations = {
     toggleTheme: 'Temayı değiştir',
     menu: 'Menü',
     close: 'Kapat',
+    zoomIn: 'Yakınlaştır',
+    zoomOut: 'Uzaklaştır',
+    fitToView: 'Ekrana sığdır',
+    privacy: 'Gizlilik',
+    canvasLabel: 'Soy ağacı tuvali — kaydırmak için ok tuşlarını kullanın',
   },
   auth: {
     plantTree: 'Aile ağacınızı oluşturun',
@@ -718,6 +741,7 @@ const tr: Translations = {
       'Bir kişiye dokunun, ardından ebeveyn, partner, çocuk veya kardeş eklemek için + kullanın.',
     share:
       'Paylaş bir bağlantı kopyalar — bağlantıya ve parolaya sahip herkes görüntüleyip düzenleyebilir.',
+    dismiss: 'Yoksay',
   },
 };
 

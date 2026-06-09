@@ -38,7 +38,6 @@ export function MenuRow({
   return (
     <button
       type="button"
-      role="menuitem"
       onClick={onClick}
       disabled={disabled}
       className={`flex items-center gap-3 w-full h-11 px-3 rounded-lg text-sm font-body text-start

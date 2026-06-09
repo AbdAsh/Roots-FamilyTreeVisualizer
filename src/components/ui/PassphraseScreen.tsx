@@ -111,6 +111,7 @@ export function PassphraseScreen() {
         <Button
           variant="ghost"
           size="sm"
+          className="touch-target"
           onClick={toggleTheme}
           aria-label={strings.app.toggleTheme}
           title={strings.app.toggleTheme}
@@ -299,7 +300,7 @@ export function PassphraseScreen() {
           href="/privacy.html"
           className="text-[10px] text-cream-dark hover:text-cream transition-colors"
         >
-          Privacy
+          {strings.app.privacy}
         </a>
       </div>
 

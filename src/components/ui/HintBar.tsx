@@ -82,7 +82,8 @@ export function HintBar() {
         <span className="flex-1 text-center leading-snug">{hintText}</span>
         <button
           onClick={onDismiss}
-          aria-label="Dismiss hint"
+          aria-label={strings.hints.dismiss}
+          title={strings.hints.dismiss}
           className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full text-cream-dark hover:text-cream hover:bg-cream/10 transition-colors cursor-pointer"
         >
           <X size={11} />

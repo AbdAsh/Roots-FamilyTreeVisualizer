@@ -39,7 +39,7 @@ export function LanguageSwitcher({ variant = 'icon' }: LanguageSwitcherProps) {
       ) : (
         <button
           onClick={() => setOpen(!open)}
-          className="w-8 h-8 rounded-md flex items-center justify-center text-cream-dark hover:text-cream hover:bg-cream/5 transition-colors cursor-pointer"
+          className="w-8 h-8 touch-target rounded-md flex items-center justify-center text-cream-dark hover:text-cream hover:bg-cream/5 transition-colors cursor-pointer"
           title={strings.app.language}
         >
           <Globe size={14} />
@@ -62,7 +62,7 @@ export function LanguageSwitcher({ variant = 'icon' }: LanguageSwitcherProps) {
             >
               <span>{LOCALE_META[l].flag}</span>
               <span>{LOCALE_META[l].label}</span>
-              {locale === l && <Check size={12} className="ml-auto" />}
+              {locale === l && <Check size={12} className="ms-auto" />}
             </button>
           ))}
         </div>

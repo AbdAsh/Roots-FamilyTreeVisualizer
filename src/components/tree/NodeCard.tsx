@@ -102,9 +102,13 @@ function GenderControl({
   labels: Record<Gender, string>;
   groupLabel: string;
 }) {
+  // Presented as a group of toggle buttons (aria-pressed) rather than an ARIA
+  // radiogroup: a radiogroup implies a single tab stop + arrow-key roving, which
+  // this didn't implement. A toggle-button group is fully conformant with plain
+  // Tab + Enter/Space and matches the actual interaction.
   return (
     <div
-      role="radiogroup"
+      role="group"
       aria-label={groupLabel}
       className="flex rounded-md border border-charcoal-lighter overflow-hidden w-fit"
     >
@@ -114,8 +118,7 @@ function GenderControl({
           <button
             key={g.value}
             type="button"
-            role="radio"
-            aria-checked={active}
+            aria-pressed={active}
             aria-label={labels[g.value]}
             title={labels[g.value]}
             onClick={() => onChange(g.value)}
@@ -222,7 +225,7 @@ function NodeCardImpl({
       return;
     }
     const data = { name, gender: draftGender, customFields: {} };
-    let newId: string;
+    let created;
     if (relativeTo && newRelType) {
       // Map enabled suggestions to the new-signature format expected by addRelativeBatch.
       const resolved = suggestions
@@ -232,14 +235,13 @@ function NodeCardImpl({
           existingId: s.existingMemberId,
           newIsFrom: s.newMemberIsFrom,
         }));
-      const created = addRelativeBatch(relativeTo, newRelType, data, resolved);
-      newId = created.id;
+      created = addRelativeBatch(relativeTo, newRelType, data, resolved);
     } else {
-      const created = addMember(data); // first person → becomes root
-      newId = created.id;
+      created = addMember(data); // first person → becomes root
     }
-    selectMember(newId);
-    onCommitted?.(newId);
+    if (!created) return; // no tree loaded — nothing was added, don't select a phantom
+    selectMember(created.id);
+    onCommitted?.(created.id);
   };
 
   const matchesSearch =

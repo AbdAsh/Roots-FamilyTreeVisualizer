@@ -5,7 +5,9 @@
  * Closes on Escape key or backdrop click. Exposes proper dialog semantics
  * (`role="dialog"`/`alertdialog`, `aria-modal`, an accessible name), moves focus
  * into the dialog on open, traps Tab within it, and restores focus to the
- * trigger on close.
+ * trigger on close. Renders through a portal to `document.body` and marks the
+ * app root `inert` while open, so the background is hidden from AT (not just the
+ * Tab focus trap).
  *
  * @example
  * ```tsx
@@ -15,9 +17,25 @@
  * ```
  */
 import { type ReactNode, useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
+
+/**
+ * Shared count of open modals so the app root (`#root`) is marked `inert` while
+ * any dialog is up — this hides the background canvas/toolbar from a screen
+ * reader's virtual cursor and landmark navigation (not just the Tab focus
+ * trap). Modals are portaled to `document.body` (outside `#root`), so they stay
+ * interactive. A counter handles stacked dialogs correctly.
+ */
+let openModalCount = 0;
+function setRootInert(on: boolean): void {
+  const root = document.getElementById('root');
+  if (!root) return;
+  if (on) root.setAttribute('inert', '');
+  else root.removeAttribute('inert');
+}
 
 interface ModalProps {
   isOpen: boolean;
@@ -58,6 +76,10 @@ export function Modal({
     const prevFocus = document.activeElement as HTMLElement | null;
     const card = cardRef.current;
 
+    // Make the app background inert (AT containment) while this dialog is open.
+    openModalCount++;
+    if (openModalCount === 1) setRootInert(true);
+
     // Move focus into the dialog: first focusable element, else the card itself.
     const firstFocusable = card?.querySelector<HTMLElement>(FOCUSABLE);
     (firstFocusable ?? card)?.focus();
@@ -90,11 +112,14 @@ export function Modal({
     document.addEventListener('keydown', handleKey);
     return () => {
       document.removeEventListener('keydown', handleKey);
+      // Lift inert BEFORE restoring focus, or focusing the (still-inert) trigger fails.
+      openModalCount = Math.max(0, openModalCount - 1);
+      if (openModalCount === 0) setRootInert(false);
       prevFocus?.focus?.();
     };
   }, [isOpen]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -151,6 +176,7 @@ export function Modal({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
