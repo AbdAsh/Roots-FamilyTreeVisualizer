@@ -1,0 +1,27 @@
+# Roots
+
+> Roots is a free, privacy-first family tree maker that runs entirely in your browser. You add relatives, watch the tree grow with an automatic union-aware layout, and share it through a single encrypted link — with no accounts, no servers, and no tracking.
+
+Key facts:
+
+- Free and open source (Apache-2.0).
+- Your family tree is encrypted in the browser with AES-256-GCM (keys derived via PBKDF2, 600,000 iterations) and stored in the URL fragment (the part after `#`) — it is never sent to any server.
+- No account, no sign-up, and no email. Nothing is stored on a server, and there is no analytics or tracking of any kind.
+- Sharing a tree means sharing its link and passphrase; only someone with both can open it. There is no passphrase recovery — if it is lost, the encrypted tree cannot be opened by anyone.
+- Multilingual: English, Arabic (العربية, with full right-to-left support), and Turkish (Türkçe).
+- Build pedigree, ancestor, and descendant views; export as PNG, SVG, or JSON, and import from JSON.
+
+Differentiators (vs. typical online family tree makers): it is a private, encrypted, account-free family tree maker — there is no backend at all, so the data lives only in the link you control.
+
+## Pages
+
+- [Roots app](https://roots.abdash.net): the family tree maker / genealogy chart creator itself (a browser app).
+- [Privacy](https://roots.abdash.net/privacy.html): exactly how data is handled — nothing leaves your browser except ordinary host (Cloudflare Pages) and Google Fonts requests, neither of which includes your tree.
+
+## Source
+
+- [GitHub repository](https://github.com/AbdAsh/Roots-FamilyTreeVisualizer): full source code, Apache-2.0 licensed, so every privacy and security claim is independently verifiable.
+
+## Author
+
+- [Abdulrahman Mahmutoglu](https://abdash.net): creator and maintainer.
